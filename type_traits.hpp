@@ -21,8 +21,11 @@ namespace ft {
 		operator T() { return v; }
 	};
 
-	typedef ft::integral_constant<bool, false> false_type;
-	typedef ft::integral_constant<bool, true> true_type;
+	template<typename T, T v>
+	const T integral_constant<T, v>::value;
+
+	typedef integral_constant<bool, false> false_type;
+	typedef integral_constant<bool, true> true_type;
 
 	// is_integral
 	template<typename T> struct is_integral :			public false_type {};
@@ -40,7 +43,7 @@ namespace ft {
 	template<> struct is_integral<unsigned short> :		public true_type {};
 	template<> struct is_integral<unsigned int> :		public true_type {};
 	template<> struct is_integral<unsigned long> :		public true_type {};
-	// template<> struct is_integral<unsigned long long :	public true_type {}; // C++11
+	// template<> struct is_integral<unsigned long long> :	public true_type {}; // C++11
 
 	// Compare for equality of types.
 	template<typename, typename> struct are_same : public false_type {};
