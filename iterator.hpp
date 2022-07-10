@@ -87,8 +87,8 @@ namespace ft {
 			#endif
 		}
 
-		template<typename Iterator>
-		random_access_iterator(const random_access_iterator<Iterator, typename ft::enable_if<(ft::are_same<Iterator, typename Container::pointer>::value), Container>::type>& rhs) :
+		template<typename _TPtr>
+		random_access_iterator(const random_access_iterator<_TPtr, typename ft::enable_if<ft::are_same<_TPtr, typename Container::pointer>::value, Container>::type>& rhs) :
 			_ptr(rhs.address()) {}
 
 		random_access_iterator(const random_access_iterator& copy) : _ptr(copy.address()) {
