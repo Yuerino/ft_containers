@@ -83,3 +83,6 @@ dkms.conf
 ### 42 ###
 # Executables
 vector
+
+# Unit test
+test/

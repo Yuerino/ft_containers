@@ -23,6 +23,14 @@ assert: re
 debug: CFLAGS = -Wall -Wextra -Werror -D ASSERT_TEST -D DEBUG
 debug: re
 
+test:
+		git clone --recurse-submodules https://github.com/Yuerino/ft_containters_unit_test.git test
+
+run_test: | test
+		make re -C test/
+		./test/unit_test
+		make clean -C test/
+
 clean:
 		@$(RM) $(NAME)
 
