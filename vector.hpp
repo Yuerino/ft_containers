@@ -186,7 +186,7 @@ namespace ft {
 		 * element in the vector. Iteration is done in reverse element order.
 		 */
 		reverse_iterator rend() {
-			return reverse_iterator(this->start() - 1);
+			return reverse_iterator(this->begin() - 1);
 		}
 
 		/**
@@ -194,7 +194,7 @@ namespace ft {
 		 * element in the vector. Iteration is done in reverse element order.
 		 */
 		const_reverse_iterator rend() const {
-			return const_reverse_iterator(this->start() - 1);
+			return const_reverse_iterator(this->begin() - 1);
 		}
 
 		// capacity
@@ -297,22 +297,18 @@ namespace ft {
 		}
 
 		reference front() {
-			if (this->size() == 0) return 0;
 			return *this->_storage_start;
 		}
 
 		const_reference front() const {
-			if (this->size() == 0) return 0;
 			return *this->_storage_start;
 		}
 
 		reference back() {
-			if (this->size() == 0) return 0;
 			return *(this->_storage_start + this->size() - 1);
 		}
 
 		const_reference back() const {
-			if (this->size() == 0) return 0;
 			return *(this->_storage_start + this->size() - 1);
 		}
 
