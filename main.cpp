@@ -1,10 +1,12 @@
 #include "vector.hpp"
 #include "iterator.hpp"
 #include "type_traits.hpp"
+#include "stack.hpp"
 
 #include <iostream>
 #include <type_traits> // C++11
 #include <vector>
+#include <stack>
 
 struct A {};
 
@@ -144,24 +146,48 @@ int main() {
 	// 	std::cout << "it1 == it3: " << (it1 == it3) << std::endl;
 	// 	std::cout << "it1 == it4: " << (it1 == it4) << std::endl;
 	// }
-	{
-		ft::vector<int> myvector;
-		for(int i=1;i<=5;++i) myvector.push_back(i);
-		ft::vector<int>::const_iterator it = myvector.begin();
-		ft::vector<int>::const_reverse_iterator rit = myvector.rbegin();
-		std::cout << *rit << std::endl;
-		std::cout << "myvector contains:";
-		for (unsigned i=0; i<myvector.size(); ++i)
-			std::cout << ' ' << myvector[i];
-		std::cout << '\n';
-		// ++(*rit);
-		std::cout << "myvector contains:";
-		for (unsigned i=0; i<myvector.size(); ++i)
-			std::cout << ' ' << myvector[i];
-		std::cout << '\n';
-		std::cout << *rit << std::endl;
-		std::cout << rit[2] << std::endl;
-	}
+	// {
+	// 	ft::vector<int> myvector;
+	// 	myvector.push_back(1); myvector.push_back(2);
+	// 	ft::vector<int>::reverse_iterator rit1 = myvector.rbegin();
+	// 	ft::vector<int>::reverse_iterator rit2 = myvector.rbegin();
+	// 	ft::vector<int>::reverse_iterator rit3 = myvector.rend();
+	// 	ft::vector<int>::const_reverse_iterator rit4 = myvector.rbegin();
+
+	// 	std::cout << "rit1 == rit2: " << (rit1 == rit2) << std::endl;
+	// 	std::cout << "rit1 == rit3: " << (rit1 == rit3) << std::endl;
+	// 	std::cout << "rit1 == rit4: " << (rit1 == rit4) << std::endl;
+	// }
+	// {
+	// 	ft::vector<int> myvector;
+	// 	for(int i=1;i<=5;++i) myvector.push_back(i);
+	// 	ft::vector<int>::const_iterator it = myvector.begin();
+	// 	ft::vector<int>::const_reverse_iterator rit = myvector.rbegin();
+	// 	std::cout << *rit << std::endl;
+	// 	std::cout << "myvector contains:";
+	// 	for (unsigned i=0; i<myvector.size(); ++i)
+	// 		std::cout << ' ' << myvector[i];
+	// 	std::cout << '\n';
+	// 	// ++(*rit);
+	// 	std::cout << "myvector contains:";
+	// 	for (unsigned i=0; i<myvector.size(); ++i)
+	// 		std::cout << ' ' << myvector[i];
+	// 	std::cout << '\n';
+	// 	std::cout << *rit << std::endl;
+	// 	std::cout << rit[2] << std::endl;
+	// }
+	// {
+	// 	ft::stack<int> mystack;
+	// 	for (int i=0; i<5; ++i) mystack.push(i);
+
+	// 	std::cout << "Popping out elements...";
+	// 	while (!mystack.empty())
+	// 	{
+	// 		std::cout << ' ' << mystack.top();
+	// 		mystack.pop();
+	// 	}
+	// 	std::cout << '\n';
+	// }
 	return 0;
 }
 
