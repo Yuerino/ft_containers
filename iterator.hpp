@@ -79,7 +79,7 @@ namespace ft {
 		typedef typename ft::iterator_traits<TPtr>::iterator_category	iterator_category;
 
 	public:
-		random_access_iterator() : _ptr(NULL) {
+		random_access_iterator() : _ptr(0) {
 			#ifdef DEBUG
 				std::cout << "random access iterator default constructor called" << std::endl;
 			#endif
@@ -177,77 +177,77 @@ namespace ft {
 
 	template<typename TPtr1, typename TPtr2, typename Container>
 	bool operator==(const random_access_iterator<TPtr1, Container>& lhs, const random_access_iterator<TPtr2, Container>& rhs) {
-		return lhs._ptr == rhs._ptr;
+		return lhs.address() == rhs.address();
 	}
 
 	template<typename TPtr, typename Container>
 	bool operator==(const random_access_iterator<TPtr, Container>& lhs, const random_access_iterator<TPtr, Container>& rhs) {
-		return lhs._ptr == rhs._ptr;
+		return lhs.address() == rhs.address();
 	}
 
 	template<typename TPtr1, typename TPtr2, typename Container>
 	bool operator!=(const random_access_iterator<TPtr1, Container>& lhs, const random_access_iterator<TPtr2, Container>& rhs) {
-		return lhs._ptr != rhs._ptr;
+		return lhs.address() != rhs.address();
 	}
 
 	template<typename TPtr, typename Container>
 	bool operator!=(const random_access_iterator<TPtr, Container>& lhs, const random_access_iterator<TPtr, Container>& rhs) {
-		return lhs._ptr != rhs._ptr;
+		return lhs.address() != rhs.address();
 	}
 
 	template<typename TPtr1, typename TPtr2, typename Container>
 	bool operator<(const random_access_iterator<TPtr1, Container>& lhs, const random_access_iterator<TPtr2, Container>& rhs) {
-		return lhs._ptr < rhs._ptr;
+		return lhs.address() < rhs.address();
 	}
 
 	template<typename TPtr, typename Container>
 	bool operator<(const random_access_iterator<TPtr, Container>& lhs, const random_access_iterator<TPtr, Container>& rhs) {
-		return lhs._ptr < rhs._ptr;
+		return lhs.address() < rhs.address();
 	}
 
 	template<typename TPtr1, typename TPtr2, typename Container>
 	bool operator<=(const random_access_iterator<TPtr1, Container>& lhs, const random_access_iterator<TPtr2, Container>& rhs) {
-		return lhs._ptr <= rhs._ptr;
+		return lhs.address() <= rhs.address();
 	}
 
 	template<typename TPtr, typename Container>
 	bool operator<=(const random_access_iterator<TPtr, Container>& lhs, const random_access_iterator<TPtr, Container>& rhs) {
-		return lhs._ptr <= rhs._ptr;
+		return lhs.address() <= rhs.address();
 	}
 
 	template<typename TPtr1, typename TPtr2, typename Container>
 	bool operator>(const random_access_iterator<TPtr1, Container>& lhs, const random_access_iterator<TPtr2, Container>& rhs) {
-		return lhs._ptr > rhs._ptr;
+		return lhs.address() > rhs.address();
 	}
 
 	template<typename TPtr, typename Container>
 	bool operator>(const random_access_iterator<TPtr, Container>& lhs, const random_access_iterator<TPtr, Container>& rhs) {
-		return lhs._ptr > rhs._ptr;
+		return lhs.address() > rhs.address();
 	}
 
 	template<typename TPtr1, typename TPtr2, typename Container>
 	bool operator>=(const random_access_iterator<TPtr1, Container>& lhs, const random_access_iterator<TPtr2, Container>& rhs) {
-		return lhs._ptr >= rhs._ptr;
+		return lhs.address() >= rhs.address();
 	}
 
 	template<typename TPtr, typename Container>
 	bool operator>=(const random_access_iterator<TPtr, Container>& lhs, const random_access_iterator<TPtr, Container>& rhs) {
-		return lhs._ptr >= rhs._ptr;
+		return lhs.address() >= rhs.address();
 	}
 
 	template<typename TPtr1, typename TPtr2, typename Container>
 	typename ft::iterator_traits<TPtr1>::difference_type operator-(const random_access_iterator<TPtr1, Container>& lhs, const random_access_iterator<TPtr2, Container>& rhs) {
-		return lhs._ptr - rhs._ptr;
+		return lhs.address() - rhs.address();
 	}
 
 	template<typename TPtr, typename Container>
 	typename ft::iterator_traits<TPtr>::difference_type operator-(const random_access_iterator<TPtr, Container>& lhs, const random_access_iterator<TPtr, Container>& rhs) {
-		return lhs._ptr - rhs._ptr;
+		return lhs.address() - rhs.address();
 	}
 
 	template<typename TPtr, typename Container>
 	random_access_iterator<TPtr, Container> operator+(typename ft::iterator_traits<TPtr>::difference_type val, const random_access_iterator<TPtr, Container>& rhs) {
-		return random_access_iterator<TPtr, Container>(rhs._ptr + val);
+		return random_access_iterator<TPtr, Container>(rhs.address() + val);
 	}
 
 	// ft:reverse_iterator
@@ -359,77 +359,77 @@ namespace ft {
 
 	template<typename Iterator1, typename Iterator2>
 	bool operator==(const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs) {
-		return lhs._iterator == rhs._iterator;
+		return lhs.get_iterator() == rhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	bool operator==(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {
-		return lhs._iterator == rhs._iterator;
+		return lhs.get_iterator() == rhs.get_iterator();
 	}
 
 	template<typename Iterator1, typename Iterator2>
 	bool operator!=(const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs) {
-		return lhs._iterator != rhs._iterator;
+		return lhs.get_iterator() != rhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	bool operator!=(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {
-		return lhs._iterator != rhs._iterator;
+		return lhs.get_iterator() != rhs.get_iterator();
 	}
 
 	template<typename Iterator1, typename Iterator2>
 	bool operator<(const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs) {
-		return lhs._iterator < rhs._iterator;
+		return lhs.get_iterator() < rhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	bool operator<(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {
-		return lhs._iterator < rhs._iterator;
+		return lhs.get_iterator() < rhs.get_iterator();
 	}
 
 	template<typename Iterator1, typename Iterator2>
 	bool operator<=(const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs) {
-		return lhs._iterator <= rhs._iterator;
+		return lhs.get_iterator() <= rhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	bool operator<=(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {
-		return lhs._iterator <= rhs._iterator;
+		return lhs.get_iterator() <= rhs.get_iterator();
 	}
 
 	template<typename Iterator1, typename Iterator2>
 	bool operator>(const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs) {
-		return lhs._iterator > rhs._iterator;
+		return lhs.get_iterator() > rhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	bool operator>(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {
-		return lhs._iterator > rhs._iterator;
+		return lhs.get_iterator() > rhs.get_iterator();
 	}
 
 	template<typename Iterator1, typename Iterator2>
 	bool operator>=(const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs) {
-		return lhs._iterator >= rhs._iterator;
+		return lhs.get_iterator() >= rhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	bool operator>=(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {
-		return lhs._iterator >= rhs._iterator;
+		return lhs.get_iterator() >= rhs.get_iterator();
 	}
 
 	template<typename Iterator1, typename Iterator2>
 	typename ft::iterator_traits<Iterator1>::difference_type operator-(const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs) {
-		return lhs._iterator - rhs._iterator;
+		return lhs.get_iterator() - rhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	typename ft::iterator_traits<Iterator>::difference_type operator-(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {
-		return lhs._iterator - rhs._iterator;
+		return lhs.get_iterator() - rhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	reverse_iterator<Iterator> operator+(typename ft::iterator_traits<Iterator>::difference_type val, const reverse_iterator<Iterator>& rhs) {
-		return reverse_iterator<Iterator>(rhs._iterator + val);
+		return reverse_iterator<Iterator>(rhs.get_iterator() + val);
 	}
 
 	// ft::distance
