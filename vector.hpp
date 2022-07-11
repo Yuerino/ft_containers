@@ -6,11 +6,10 @@
 #include "algorithm.hpp"
 
 #include <memory>
-#include <iostream>
-#include <iterator>
 #include <exception>
-
-// #define DEBUG
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 namespace ft {
 	template< typename T, typename Allocator = std::allocator<T> >
@@ -24,8 +23,8 @@ namespace ft {
 		typedef typename Allocator::const_pointer									const_pointer;
 		typedef ft::random_access_iterator<pointer, vector>							iterator;
 		typedef ft::random_access_iterator<const_pointer, vector>					const_iterator;
-		// typedef ft::reverse_iterator<iterator>									reverse_iterator;
-		// typedef ft::reverse_iterator<const_iterator>								const_reverse_iterator;
+		typedef ft::reverse_iterator<iterator>										reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator>								const_reverse_iterator;
 		typedef std::ptrdiff_t														difference_type;
 		typedef std::size_t															size_type;
 
@@ -170,25 +169,33 @@ namespace ft {
 		 * @brief Return a read/write reverse iterator that points to the last
 		 * element in the vector. Iteration is done in reverse element order.
 		 */
-		// reverse_iterator rbegin();
+		reverse_iterator rbegin() {
+			return reverse_iterator(this->end() - 1);
+		}
 
 		/**
 		 * @brief Return a read-only (constant) reverse iterator that points to the last
 		 * element in the vector. Iteration is done in reverse element order.
 		 */
-		// const_reverse_iterator rbegin() const;
+		const_reverse_iterator rbegin() const {
+			return const_reverse_iterator(this->end() - 1);
+		}
 
 		/**
 		 * @brief Return a read/write reverse iterator that points one before the first
 		 * element in the vector. Iteration is done in reverse element order.
 		 */
-		// reverse_iterator rend();
+		reverse_iterator rend() {
+			return reverse_iterator(this->start() - 1);
+		}
 
 		/**
 		 * @brief Return a read-only (constant) reverse iterator that points one before the first
 		 * element in the vector. Iteration is done in reverse element order.
 		 */
-		// const_reverse_iterator rend() const;
+		const_reverse_iterator rend() const {
+			return const_reverse_iterator(this->start() - 1);
+		}
 
 		// capacity
 
@@ -216,7 +223,16 @@ namespace ft {
 		 * @param n Number of elements the vector should contain.
 		 * @param val Data with which new elements should be populated.
 		 */
-		// void resize(size_type n, value_type val = value_type());
+		void resize(size_type n, value_type val = value_type()) {
+			size_type old_size = this->_size;
+			if (old_size != n)
+				this->reallocate(n);
+			if (n > old_size) {
+				for (size_type i = old_size; i < n; ++i)
+					this->get_allocator().construct(this->_storage_start + i, val);
+			}
+			this->_size = n;
+		}
 
 		/**
 		 * @brief Returns the total number of elements that the vector can
@@ -324,26 +340,88 @@ namespace ft {
 
 		void push_back(const value_type& val) {
 			if (this->size() == this->capacity())
-				this->reallocate(this->capacity() * 2);
+				this->reallocate(this->capacity() + 1);
 			this->get_allocator().construct(this->_storage_start + this->size(), val);
 			this->_size++;
 		}
 
 		void pop_back() {
-			this->get_allocator().destroy(this->_storage_start + this->size());
+			this->get_allocator().destroy(this->_storage_start + this->_size - 1);
 			this->_size--;
 		}
 
-		// iterator insert(iterator position, const value_type& val);
+		iterator insert(iterator position, const value_type& val) {
+			iterator it = this->begin();
+			iterator it_end = this->end();
+			if (this->_size == this->_capacity)
+				this->reallocate(this->_size + 1);
+			size_type i = ft::distance(it, position);
+			this->_size++;
+			it += i;
+			this->get_allocator().construct(this->_storage_start + i, val);
+			for (++i; it != it_end; ++i, ++it)
+				this->get_allocator().construct(this->_storage_start + i, *it);
+			return iterator(this->_storage_start);
+		}
 
-		// void insert(iterator position, size_type n, const value_type& val);
+		void insert(iterator position, size_type n, const value_type& val) {
+			iterator it = this->begin();
+			iterator it_end = this->end();
+			if (this->_size + n > this->_capacity)
+				this->reallocate(this->_size + n);
+			size_type i = ft::distance(it, position);
+			this->_size = this->_size + n;
+			it += i;
+			for (; n > 0; ++i, --n)
+				this->get_allocator().construct(this->_storage_start + i, val);
+			for (; it != it_end; ++i, ++it)
+				this->get_allocator().construct(this->_storage_start + i, *it);
+		}
 
-		// template<typename InputIterator>
-		// void insert(iterator position, InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0);
+		template<typename InputIterator>
+		void insert(iterator position, InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0) {
+			iterator it = this->begin();
+			iterator it_end = this->end();
+			size_type n = ft::distance(first, last);
+			if (this->_size + n > this->_capacity)
+				this->reallocate(this->_size + n);
+			size_type i = ft::distance(it, position);
+			this->_size = this->_size + n;
+			it += i;
+			for (; first != last; ++i, ++first)
+				this->get_allocator().construct(this->_storage_start + i, *first);
+			for (; it != it_end; ++i, ++it)
+				this->get_allocator().construct(this->_storage_start + i, *it);
+		}
 
-		// iterator erase(iterator position);
+		iterator erase(iterator position) {
+			iterator it = this->begin();
+			iterator it_end = this->end();
+			size_type i = ft::distance(it, position);
+			it += i;
+			iterator it_ret = it;
+			for (++it; it != it_end; ++i, ++it)
+				this->get_allocator().construct(this->_storage_start + i, *it);
+			this->get_allocator().destroy(this->_storage_start + this->_size - 1);
+			this->_size--;
+			return it_ret;
+		}
 
-		// iterator erase(iterator first, iterator last);
+		iterator erase(iterator first, iterator last) {
+			iterator it = this->begin();
+			iterator it_end = this->end();
+			size_type i = ft::distance(it, first);
+			size_type n = ft::distance(first, last);
+			it += i + n;
+			iterator it_ret = it;
+			for (++it; it != it_end; ++i, ++it)
+				this->get_allocator().construct(this->_storage_start + i, *it);
+			for (++n;n > 0; --n) {
+				this->get_allocator().destroy(this->_storage_start + this->_size - 1);
+				this->_size--;
+			}
+			return it_ret;
+		}
 
 		void swap(vector& x) {
 			ft::swap(this->_storage_start, x._storage_start);
@@ -371,6 +449,7 @@ namespace ft {
 		size_type _capacity;
 
 		void reallocate(size_type new_capacity) {
+			if (this->_capacity == new_capacity) return;
 			pointer new_storage = this->get_allocator().allocate(new_capacity);
 			if (this->_storage_start) {
 				for (size_type i = 0; this->_storage_start != 0 && i < new_capacity && i < this->_size; ++i)
