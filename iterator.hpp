@@ -455,4 +455,178 @@ namespace ft {
 	typename ft::iterator_traits<Iterator>::difference_type distance(Iterator first, Iterator last) {
 		return ft::_distance(first, last, typename ft::iterator_traits<Iterator>::iterator_category());
 	}
+
+	template<typename TPtr, typename Tree>
+	class bst_iterator {
+	protected:
+		typedef Tree						tree_type;
+		typedef typename Tree::node_type	node_type;
+		typedef typename Tree::node_pointer	node_pointer;
+
+		node_pointer _ptr;
+		node_pointer _tail;
+		bool _isReversed;
+
+	public:
+		typedef typename ft::iterator_traits<TPtr>::difference_type	difference_type;
+		typedef typename ft::iterator_traits<TPtr>::value_type		value_type;
+		typedef typename ft::iterator_traits<TPtr>::pointer			pointer;
+		typedef typename ft::iterator_traits<TPtr>::reference		reference;
+		typedef bidirectional_iterator_tag							iterator_category;
+
+	public:
+		bst_iterator() : _ptr(0) {
+			#ifdef DEBUG
+				std::cout << "bst_iterator default constructor called" << std::endl;
+			#endif
+		}
+
+		bst_iterator(node_pointer ptr, node_pointer tail, bool isReversed = false) :
+			_ptr(ptr),
+			_tail(tail),
+			_isReversed(isReversed) {
+			#ifdef DEBUG
+				std::cout << "bst_iterator pointer constructor called" << std::endl;
+			#endif
+		}
+
+		template<typename _TPtr>
+		bst_iterator(const bst_iterator<_TPtr, typename ft::enable_if<ft::are_same<_TPtr, typename Tree::node_pointer>::value, Tree>::type>& copy) :
+			_ptr(copy.address()) {
+			#ifdef DEBUG
+				std::cout << "random access iterator const conversion constructor called" << std::endl;
+			#endif
+		}
+
+		bst_iterator(const bst_iterator& copy) : _ptr(copy.address()) {
+			#ifdef DEBUG
+				std::cout << "random access iterator copy constructor called" << std::endl;
+			#endif
+		}
+
+		bst_iterator& operator=(const bst_iterator& rhs) {
+			#ifdef DEBUG
+				std::cout << "random access iterator assignment operator called" << std::endl;
+			#endif
+			this->_ptr = rhs._ptr;
+			this->_tail = rhs._tail;
+			this->_isReversed = rhs._isReversed;
+			return *this;
+		}
+
+		~bst_iterator() {
+			#ifdef DEBUG
+				std::cout << "random access iterator deconstructor called" << std::endl;
+			#endif
+		}
+
+		// random_access_iterator operator-(int val) {
+		// 	return random_access_iterator(this->_ptr - val);
+		// }
+
+		// random_access_iterator operator-=(int val) {
+		// 	this->_ptr -= val;
+		// 	return *this;
+		// }
+
+		// random_access_iterator operator+(int val) {
+		// 	return random_access_iterator(this->_ptr + val);
+		// }
+
+		// random_access_iterator operator+=(int val) {
+		// 	this->_ptr += val;
+		// 	return *this;
+		// }
+
+		bst_iterator& operator++() {
+			this->_ptr = this->tree_increment(this->_ptr);
+			return *this;
+		}
+
+		bst_iterator operator++(int) {
+			bst_iterator tmp = *this;
+			this->_ptr = this->tree_increment(this->_ptr);
+			return tmp;
+		}
+
+		bst_iterator& operator--() {
+			this->_ptr = this->tree_decrement(this->_ptr);
+			return *this;
+		}
+
+		bst_iterator operator--(int) {
+			bst_iterator tmp = *this;
+			this->_ptr = this->tree_decrement(this->_ptr);
+			return tmp;
+		}
+
+		reference operator*() {
+			return this->_ptr->value;
+		}
+
+		pointer operator->() {
+			return &(this->_ptr->value);
+		}
+
+		// reference operator[](const difference_type& n) {
+		// 	return *(this->_ptr + n);
+		// }
+
+		node_pointer address() const {
+			return this->_ptr;
+		}
+
+	private:
+		node_pointer tree_increment(node_pointer node) {
+			if (node == NULL)
+				return this->_tail;
+			node_pointer current = node;
+			if (current->right) {
+				current = current->right;
+				while (current->left)
+					current = current->left;
+			} else {
+				node_pointer parent = current->parent;
+				while (parent && current == parent->right) {
+					current = parent;
+					parent = parent->parent;
+				}
+				current = parent;
+			}
+			if (node == current && !this->_isReversed)
+				return NULL;
+			return current;
+		}
+
+		node_pointer tree_decrement(node_pointer node) {
+			if (node == NULL)
+				return this->_tail;
+			node_pointer current = node;
+			if (current->left) {
+				current = current->left;
+				while (current->right)
+					current = current->right;
+			} else {
+				node_pointer parent = current->parent;
+				while (parent && current == parent->left) {
+					current = parent;
+					parent = parent->parent;
+				}
+				current = parent;
+			}
+			if (node == current && this->_isReversed)
+				return NULL;
+			return current;
+		}
+	};
+
+	template<typename TPtr, typename Tree>
+	bool operator==(const bst_iterator<TPtr, Tree>& lhs, const bst_iterator<TPtr, Tree>& rhs) {
+		return lhs.address() == rhs.address();
+	}
+
+	template<typename TPtr, typename Tree>
+	bool operator!=(const bst_iterator<TPtr, Tree>& lhs, const bst_iterator<TPtr, Tree>& rhs) {
+		return lhs.address() != rhs.address();
+	}
 }

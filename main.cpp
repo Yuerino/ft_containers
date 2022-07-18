@@ -2,11 +2,13 @@
 #include "iterator.hpp"
 #include "type_traits.hpp"
 #include "stack.hpp"
+#include "tree.hpp"
 
 #include <iostream>
-#include <type_traits> // C++11
+// #include <type_traits> // C++11
 #include <vector>
 #include <stack>
+#include <set>
 
 struct A {};
 
@@ -188,6 +190,77 @@ int main() {
 	// 	}
 	// 	std::cout << '\n';
 	// }
+	{
+		ft::red_black_tree<int> rbt;
+		rbt.insert(50);
+		rbt.insert(30);
+		rbt.insert(65);
+		rbt.insert(55);
+		rbt.insert(35);
+		rbt.insert(70);
+		rbt.insert(15);
+		rbt.insert(68);
+		rbt.insert(80);
+		rbt.insert(90);
+		rbt.insert(69);
+		rbt.insert(120);
+		rbt.insert(56);
+
+		// ft::red_black_tree<int>::iterator it = rbt.begin();
+		// for (; it != rbt.end(); ++it) {
+		// 	std::cout << *it << std::endl;
+		// }
+		std::cout << std::endl;
+		rbt.printTree();
+		std::cout << std::endl;
+
+		rbt.erase(55);
+		rbt.erase(30);
+		rbt.erase(80);
+		rbt.erase(50);
+		rbt.erase(35);
+		rbt.erase(15);
+		rbt.erase(70);
+		rbt.erase(65);
+		// rbt.erase(68);
+		// for (it = rbt.begin(); it != rbt.end(); ++it) {
+		// 	std::cout << *it << std::endl;
+		// }
+		rbt.printTree();
+		std::cout << rbt.size() << std::endl;
+		// --it;
+		// std::cout << *it << std::endl;
+		// --it;
+		// std::cout << *it << std::endl;
+	}
+	// {
+	// 	std::vector<int> myvector;
+	// 	myvector.push_back(5);
+	// 	myvector.push_back(10);
+	// 	std::vector<int>::iterator ite = myvector.end();
+	// 	std::cout << *ite << std::endl;
+	// 	++ite;
+	// 	std::cout << *ite << std::endl;
+	// 	++ite;
+	// 	std::cout << *ite << std::endl;
+	// }
+	// {
+	// 	std::set<int> myset;
+	// 	myset.insert(5);
+	// 	myset.insert(2);
+	// 	std::set<int>::iterator it = myset.begin();
+	// 	std::set<int>::iterator ite = myset.end();
+	// 	for (; it != ite; ++it)
+	// 		std::cout << *it << std::endl;
+	// }
+	{
+		std::set<int> myset;
+		myset.insert(5);
+		myset.insert(2);
+		std::set<int>::iterator ite = myset.end(); // one past the end
+		--ite; // increment past one past the end, on mac segfault but on linux it will be 2
+		--ite; // 5 on linux
+	}
 	return 0;
 }
 
