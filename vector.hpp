@@ -6,7 +6,7 @@
 #include "algorithm.hpp"
 
 #include <memory>
-#include <exception>
+#include <stdexcept>
 #ifdef DEBUG
 #include <iostream>
 #endif
