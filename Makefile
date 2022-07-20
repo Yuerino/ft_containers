@@ -1,4 +1,4 @@
-NAME	= vector
+NAME	= container
 
 CC		= c++
 # https://stackoverflow.com/questions/12606713/enforcing-the-c98-standard-in-gcc
