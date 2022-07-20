@@ -29,21 +29,19 @@ namespace ft {
 		pointer right;
 
 		static pointer getMinimum(pointer node) {
-			while (node->left)
+			while (node->left != NULL)
 				node = node->left;
 			return node;
 		}
 
 		static pointer getMaximum(pointer node) {
-			while (node->right)
+			while (node->right != NULL)
 				node = node->right;
 			return node;
 		}
 
 		static bool hasChildren(pointer node) {
-			if (node->left || node->right)
-				return true;
-			return false;
+			return (node->left != NULL || node->right != NULL);
 		}
 
 		static pointer getSuccessor(pointer node) {
@@ -98,9 +96,7 @@ namespace ft {
 			}
 
 			static bool isBlack(typename rb_tree_node::pointer node) {
-				if (node == NULL || node->color == BLACK)
-					return true;
-				return false;
+				return (node == NULL || node->color == BLACK);
 			}
 		};
 
@@ -164,6 +160,7 @@ namespace ft {
 
 		red_black_tree& operator=(const red_black_tree& other) {
 			DEBUG("red_black_tree assignment operator called");
+			if (this == &other) return *this;
 			this->deleteAll();
 			this->insert(other.begin(), other.end());
 			return *this;
@@ -236,7 +233,7 @@ namespace ft {
 			tmp = this->addNewNode(val, parent);
 			if (this->_comp(val, parent->value))
 				parent->left = tmp;
-			else if (this->_comp(parent->value, val))
+			else
 				parent->right = tmp;
 			this->balanceOnInsert(tmp);
 			return ft::make_pair<iterator, bool>(iterator(tmp, node_type::getMaximum(this->_root)), true);
@@ -322,11 +319,7 @@ namespace ft {
 				return;
 			node_pointer parent = new_node->parent;
 			node_pointer grand_parent = parent->parent;
-			node_pointer parent_sibling;
-			if (grand_parent->left == parent)
-				parent_sibling = grand_parent->right;
-			else
-				parent_sibling = grand_parent->left;
+			node_pointer parent_sibling = grand_parent->left == parent ? grand_parent->right : grand_parent->left;
 			if (node_type::isBlack(parent_sibling))
 				this->rotateAndRecolor(new_node);
 			else {
@@ -420,11 +413,7 @@ namespace ft {
 				this->resolveDoubleBlack(node);
 				this->deleteNode(node);
 			} else {
-				node_pointer next;
-				if (node->left != NULL)
-					next = node_type::getPredecessor(node);
-				else
-					next = node_type::getSuccessor(node);
+				node_pointer next = node->left != NULL ? node_type::getPredecessor(node) : node_type::getSuccessor(node);
 				node_type::swapNodeValue(node, next);
 				this->destroyNode(next);
 			}
@@ -450,11 +439,7 @@ namespace ft {
 			if (node == this->_root)
 				return;
 			node_pointer parent = node->parent;
-			node_pointer sibling;
-			if (parent->left == node)
-				sibling = parent->right;
-			else
-				sibling = parent->left;
+			node_pointer sibling = parent->left == node ? parent->right : parent->left;
 			if (!node_type::isBlack(sibling)) {
 				node_type::swapNodeColor(parent, sibling);
 				if (parent->left == node)
@@ -499,9 +484,9 @@ namespace ft {
 				node = this->_root;
 			if (node == NULL)
 				return;
-			if (node->left)
+			if (node->left != NULL)
 				this->deleteAll(node->left);
-			if (node->right)
+			if (node->right != NULL)
 				this->deleteAll(node->right);
 			this->deleteNode(node);
 		}
