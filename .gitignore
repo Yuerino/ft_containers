@@ -82,7 +82,7 @@ dkms.conf
 
 ### 42 ###
 # Executables
-vector
+container
 
 # Unit test
 test/
