@@ -49,10 +49,10 @@ namespace ft {
 		typedef ft::red_black_tree<value_type, value_compare>		tree_type;
 
 	public:
-		typedef typename tree_type::iterator									iterator;
-		typedef typename tree_type::const_iterator							const_iterator;
-		typedef typename tree_type::reverse_iterator							reverse_iterator;
-		typedef typename tree_type::const_reverse_iterator					const_reverse_iterator;
+		typedef typename tree_type::iterator						iterator;
+		typedef typename tree_type::const_iterator					const_iterator;
+		typedef typename tree_type::reverse_iterator				reverse_iterator;
+		typedef typename tree_type::const_reverse_iterator			const_reverse_iterator;
 
 	public:
 		// construct/copy/destroy
@@ -85,6 +85,7 @@ namespace ft {
 
 		map& operator=(const map& x) {
 			DEBUG("map assignment operator called");
+			if (this == &x) return *this;
 			this->_tree_data = x._tree_data;
 			return *this;
 		}
@@ -152,7 +153,7 @@ namespace ft {
 			return this->_tree_data.insert(val);
 		}
 
-		// @note: ignore position hint for now (possible performance lost)
+		// @note: ignore position hint for now (minimal performance lost)
 		iterator insert(iterator position, const value_type& val) {
 			return this->_tree_data.insert(val).first;
 		}
@@ -202,19 +203,57 @@ namespace ft {
 			return this->_tree_data.find(k);
 		};
 
-		size_type count(const key_type& k) const;
+		size_type count(const key_type& k) const {
+			return this->_tree_data.find(k) != this->end() ? 1 : 0;
+		}
 
-		iterator lower_bound(const key_type& k);
+		iterator lower_bound(const key_type& k) {
+			iterator it = this->begin();
+			iterator ite = this->end();
+			for(; it != ite; ++it) {
+				if (!this->_comp(*it, k))
+					return it;
+			}
+			return ite;
+		}
 
-		const_iterator lower_bound(const key_type& k) const;
+		const_iterator lower_bound(const key_type& k) const {
+			const_iterator it = this->begin();
+			const_iterator ite = this->end();
+			for(; it != ite; ++it) {
+				if (!this->_comp(*it, k))
+					return it;
+			}
+			return ite;
+		}
 
-		iterator upper_bound(const key_type& k);
+		iterator upper_bound(const key_type& k) {
+			iterator it = this->begin();
+			iterator ite = this->end();
+			for(; it != ite; ++it) {
+				if (this->_comp(*it, k))
+					return it;
+			}
+			return ite;
+		}
 
-		const_iterator upper_bound(const key_type& k) const;
+		const_iterator upper_bound(const key_type& k) const {
+			const_iterator it = this->begin();
+			const_iterator ite = this->end();
+			for(; it != ite; ++it) {
+				if (this->_comp(*it, k))
+					return it;
+			}
+			return ite;
+		}
 
-		ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const;
+		ft::pair<iterator, iterator> equal_range(const key_type& k) {
+			return ft:make_pair<iterator, iterator>(this->lower_bound(k), this->upper_bound(k));
+		}
 
-		ft::pair<iterator, iterator> equal_range(const key_type& k);
+		ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const {
+			return ft::make_pair<const_iterator, const_iterator>(this->lower_bound(k), this->upper_bound(k));
+		}
 
 		// allocator
 
