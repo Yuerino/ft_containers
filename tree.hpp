@@ -3,9 +3,15 @@
 #include "utility.hpp"
 #include "functional.hpp"
 #include "iterator.hpp"
+
 #include <memory>
 
+#ifdef _TREE_DEBUG
 #include <iostream>
+#define DEBUG(x) (std::cout << x << std::endl)
+#else
+#define DEBUG(x)
+#endif
 
 namespace ft {
 	template<typename T, typename TreeNode>
@@ -45,7 +51,7 @@ namespace ft {
 				return binary_tree_node::getMinimum(node->right);
 			else {
 				pointer parent = node->parent;
-				while (parent && node == parent->left) {
+				while (parent != NULL && node == parent->right) {
 					node = parent;
 					parent = parent->parent;
 				}
@@ -59,7 +65,7 @@ namespace ft {
 				return binary_tree_node::getMaximum(node->left);
 			else {
 				pointer parent = node->parent;
-				while (parent && node == parent->right) {
+				while (parent != NULL && node == parent->left) {
 					node = parent;
 					parent = parent->parent;
 				}
@@ -119,31 +125,99 @@ namespace ft {
 		typedef typename node_type::const_pointer							const_node_pointer;
 
 	public:
+		// construct/copy/destroy
+
 		explicit red_black_tree(const compare_type& comp = compare_type(), const allocator_type& alloc = allocator_type()) :
 			_comp(comp),
 			_allocator(alloc),
 			_node_allocator(node_allocator_type()),
 			_size(0),
-			_root(0) {}
+			_root(0) {
+			DEBUG("red_black_tree default iterator called");
+		}
 
-		red_black_tree(const red_black_tree& copy);
+		template<typename InputIterator>
+		red_black_tree(InputIterator first, InputIterator last, const compare_type& comp = compare_type(), const allocator_type& alloc = allocator_type(), typename ft::iterator_traits<InputIterator>::iterator_catergory* = 0) :
+			_comp(comp),
+			_allocator(alloc),
+			_node_allocator(node_allocator_type()),
+			_size(0),
+			_root(0) {
+			DEBUG("red_black_tree range constructor called");
+			this->insert(first, last);
+		}
+
+		red_black_tree(const red_black_tree& copy) :
+			_comp(copy._comp),
+			_allocator(copy.get_allocator()),
+			_node_allocator(copy.get_node_allocator()),
+			_size(0),
+			_root(0) {
+			DEBUG("red_black_tree copy constructor called");
+			this->operator=(copy);
+		};
 
 		~red_black_tree() {
-			this->deleteAll(NULL);
+			DEBUG("red_black_tree deconstructor called");
+			this->deleteAll();
 		}
 
 		red_black_tree& operator=(const red_black_tree& other) {
-			// TODO: replace with iterator assign later
-			this->_comp = other._comp;
-			this->_allocator = other.get_allocator();
-			this->_node_allocator = other.get_node_allocator();
-			this->_size = other._size;
-			this->_root = other._root;
+			DEBUG("red_black_tree assignment operator called");
+			this->deleteAll();
+			this->insert(other.begin(), other.end());
+			return *this;
 		}
+
+		// iterators
+
+		iterator begin() {
+			return iterator(node_type::getMinimum(this->_root), node_type::getMaximum(this->_root));
+		}
+
+		const_iterator begin() const {
+			return const_iterator(node_type::getMinimum(this->_root), node_type::getMaximum(this->_root));
+		}
+
+		iterator end() {
+			return iterator(NULL, node_type::getMaximum(this->_root));
+		}
+
+		const_iterator end() const {
+			return const_iterator(NULL, node_type::getMaximum(this->_root));
+		}
+
+		iterator rbegin() {
+			return reverse_iterator(iterator(node_type::getMaximum(this->_root), node_type::getMinimum(this->_root)));
+		}
+
+		const_iterator rbegin() const {
+			return const_reverse_iterator(const_iterator(node_type::getMaximum(this->_root), node_type::getMinimum(this->_root)));
+		}
+
+		iterator rend() {
+			return reverse_iterator(iterator(NULL, node_type::getMinimum(this->_root)));
+		}
+
+		const_iterator rend() const {
+			return const_reverse_iterator(const_iterator(NULL, node_type::getMinimum(this->_root)));
+		}
+
+		// capacity
 
 		bool empty() const {
 			return this->_size == 0;
 		}
+
+		size_type size() const {
+			return this->_size;
+		}
+
+		size_type max_size() const {
+			return this->_node_allocator.max_size();
+		}
+
+		// modifiers
 
 		ft::pair<iterator, bool> insert(const value_type& val) {
 			if (this->empty())
@@ -168,34 +242,42 @@ namespace ft {
 			return ft::make_pair<iterator, bool>(iterator(tmp, node_type::getMaximum(this->_root)), true);
 		}
 
-		void erase(const value_type& val) {
-			this->destroyNode(this->find(val));
+		template<typename InputIterator>
+		void insert(InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0) {
+			for (; first != last; ++first)
+				this->insert(*first);
 		}
 
-		iterator begin() {
-			return iterator(node_type::getMinimum(this->_root), node_type::getMaximum(this->_root));
+		void erase(iterator position) {
+			this->destroyNode(position.address());
 		}
 
-		iterator end() {
-			return iterator(NULL, node_type::getMaximum(this->_root));
+		size_type erase(const value_type& val) {
+			node_pointer to_delete = this->getNode(val);
+			if (to_delete == NULL)
+				return 0;
+			this->destroyNode(to_delete);
+			return 1;
 		}
 
-		node_pointer find(const value_type& val) const {
-			node_pointer tmp = this->_root;
-			while (tmp != NULL) {
-				if (this->_comp(val, tmp->value))
-					tmp = tmp->left;
-				else if (this->_comp(tmp->value, val))
-					tmp = tmp->right;
-				else
-					return tmp;
-			}
-			return tmp;
+		void erase(iterator first, iterator last) {
+			for (; first != last; ++first)
+				this->destroyNode(first.address());
 		}
 
-		size_type size() const {
-			return this->_size;
+		void clear() {
+			this->destroyAll();
 		}
+
+		iterator find(const value_type& val) {
+			return iterator(this->getNode(val), node_type::getMaximum(this->_root));
+		}
+
+		const_iterator find(const value_type& val) const {
+			return const_iterator(this->getNode(val), node_type::getMaximum(this->_root));
+		}
+
+		// allocator
 
 		allocator_type get_allocator() const {
 			return allocator_type(this->_allocator);
@@ -205,6 +287,9 @@ namespace ft {
 			return node_allocator_type(this->_node_allocator);
 		}
 
+		// draw tree
+
+	#ifdef _TREE_DEBUG
 		void printNode(const std::string& prefix, node_pointer node, bool isLeft)
 		{
 			if (node != NULL)
@@ -220,6 +305,7 @@ namespace ft {
 		void printTree() {
 			this->printNode("", this->_root, false);
 		}
+	#endif
 
 	private:
 		/**
@@ -408,7 +494,7 @@ namespace ft {
 			}
 		}
 
-		void deleteAll(node_pointer node) {
+		void deleteAll(node_pointer node = NULL) {
 			if (node == NULL)
 				node = this->_root;
 			if (node == NULL)
@@ -418,6 +504,19 @@ namespace ft {
 			if (node->right)
 				this->deleteAll(node->right);
 			this->deleteNode(node);
+		}
+
+		node_pointer getNode(const value_type& val) const {
+			node_pointer tmp = this->_root;
+			while (tmp != NULL) {
+				if (this->_comp(val, tmp->value))
+					tmp = tmp->left;
+				else if (this->_comp(tmp->value, val))
+					tmp = tmp->right;
+				else
+					return tmp;
+			}
+			return NULL;
 		}
 
 	protected:
