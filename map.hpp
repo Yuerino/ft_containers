@@ -3,14 +3,15 @@
 #include "functional.hpp"
 #include "utility.hpp"
 #include "tree.hpp"
+#include "algorithm.hpp"
 
 #include <memory>
 
 #ifdef _MAP_DEBUG
 #include <iostream>
-#define DEBUG(x) (std::cout << x << std::endl)
+#define MAP_DEBUG(x) (std::cout << x << std::endl)
 #else
-#define DEBUG(x)
+#define MAP_DEBUG(x)
 #endif
 
 namespace ft {
@@ -61,7 +62,7 @@ namespace ft {
 			_comp(comp),
 			_allocator(alloc),
 			_tree_data(tree_type(value_compare(comp))) {
-			DEBUG("map default constructor called");
+			MAP_DEBUG("map default constructor called");
 		}
 
 		template<typename InputIterator>
@@ -69,22 +70,22 @@ namespace ft {
 			_comp(comp),
 			_allocator(alloc),
 			_tree_data(tree_type(first, last, value_compare(comp))) {
-			DEBUG("map range constructor called");
+			MAP_DEBUG("map range constructor called");
 		}
 
 		map(const map& x) :
 			_comp(key_compare()),
 			_allocator(x.get_allocator()),
 			_tree_data(x._tree_data) {
-			DEBUG("map copy constructor called");
+			MAP_DEBUG("map copy constructor called");
 		}
 
 		~map() {
-			DEBUG("map deconstructor called");
+			MAP_DEBUG("map deconstructor called");
 		}
 
 		map& operator=(const map& x) {
-			DEBUG("map assignment operator called");
+			MAP_DEBUG("map assignment operator called");
 			if (this == &x) return *this;
 			this->_tree_data = x._tree_data;
 			return *this;
@@ -141,7 +142,7 @@ namespace ft {
 		// element access
 
 		mapped_type& operator[](const key_type& k) {
-			iterator tmp = this->find(k);
+			iterator tmp = this->find(ft::make_pair<key_type, mapped_type>(k, mapped_type()));
 			if (tmp != this->end())
 				return tmp->second;
 			return (this->insert(ft::make_pair<key_type, mapped_type>(k, mapped_type())).first)->second;
@@ -168,7 +169,7 @@ namespace ft {
 		}
 
 		size_type erase(const key_type& k) {
-			return this->_tree_data.erase(k);
+			return this->_tree_data.erase(ft::make_pair<key_type, mapped_type>(k, mapped_type()));
 		}
 
 		void erase(iterator first, iterator last) {
@@ -196,15 +197,15 @@ namespace ft {
 		// operations
 
 		iterator find(const key_type& k) {
-			return this->_tree_data.find(k);
+			return this->_tree_data.find(ft::make_pair<key_type, mapped_type>(k, mapped_type()));
 		}
 
 		const_iterator find(const key_type& k) const {
-			return this->_tree_data.find(k);
+			return this->_tree_data.find(ft::make_pair<key_type, mapped_type>(k, mapped_type()));
 		};
 
 		size_type count(const key_type& k) const {
-			return this->_tree_data.find(k) != this->end() ? 1 : 0;
+			return this->_tree_data.find(ft::make_pair<key_type, mapped_type>(k, mapped_type())) != this->end() ? 1 : 0;
 		}
 
 		iterator lower_bound(const key_type& k) {
