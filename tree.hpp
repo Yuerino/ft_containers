@@ -8,9 +8,9 @@
 
 #ifdef _TREE_DEBUG
 #include <iostream>
-#define DEBUG(x) (std::cout << x << std::endl)
+#define TREE_DEBUG(x) (std::cout << x << std::endl)
 #else
-#define DEBUG(x)
+#define TREE_DEBUG(x)
 #endif
 
 namespace ft {
@@ -72,10 +72,55 @@ namespace ft {
 			return node;
 		}
 
-		static void swapNodeValue(pointer node1, pointer node2) {
-			value_type tmp = node1->value;
-			node1->value = node2->value;
-			node2->value = tmp;
+		static bool swapNodeValue(pointer node1, pointer node2) {
+			pointer parent1 = node1->parent;
+			pointer node1Left = node1->left;
+			pointer node1Right = node1->right;
+			pointer parent2 = node2->parent;
+			pointer node2Left = node2->left;
+			pointer node2Right = node2->right;
+
+			if (parent1 != NULL && parent1->left == node1)
+				parent1->left = node2;
+			else if (parent1 != NULL)
+				parent1->right = node2;
+			node2->parent = parent1;
+
+			if (parent2 != NULL && parent2->left == node2)
+				parent2->left = node1;
+			else if (parent2 != NULL)
+				parent2->right = node1;
+			if (parent2 != node1)
+				node1->parent = parent2;
+			else
+				node1->parent = node2;
+
+			if (node1Left == node2) {
+				node2->left = node1;
+				node2->right = node1Right;
+			} else if (node1Right == node2) {
+				node2->right = node1;
+				node2->left = node1Left;
+			} else {
+				node2->left = node1Left;
+				node2->right = node1Right;
+			}
+
+			if (node1Right && node1Right != node2)
+				node1Right->parent = node2;
+			if (node1Left && node1Left != node2)
+				node1Left->parent = node2;
+
+			node1->left = node2Left;
+			if (node2Left)
+				node2Left->parent = node1;
+			node1->right = node2Right;
+			if (node2Right)
+				node2Right->parent = node1;
+
+			if (parent1 == NULL)
+				return false;
+			return true;
 		}
 	};
 
@@ -90,9 +135,16 @@ namespace ft {
 			rb_tree_color color;
 
 			static void swapNodeColor(typename rb_tree_node::pointer node1, typename rb_tree_node::pointer node2) {
-				rb_tree_color tmp = node1->color;
-				node1->color = node2->color;
-				node2->color = tmp;
+				rb_tree_color tmp = (node1 != NULL) ? node1->color : BLACK;
+				if (node1)
+					node1->color = (node2 != NULL) ? node2->color : BLACK;
+				if (node2)
+					node2->color = tmp;
+			}
+
+			static bool swapNodeValue(typename rb_tree_node::pointer node1, typename rb_tree_node::pointer node2) {\
+				rb_tree_node::swapNodeColor(node1, node2);
+				return binary_tree_node<T, rb_tree_node>::swapNodeValue(node1, node2);
 			}
 
 			static bool isBlack(typename rb_tree_node::pointer node) {
@@ -129,7 +181,7 @@ namespace ft {
 			_node_allocator(node_allocator_type()),
 			_size(0),
 			_root(0) {
-			DEBUG("red_black_tree default iterator called");
+			TREE_DEBUG("red_black_tree default iterator called");
 		}
 
 		template<typename InputIterator>
@@ -139,7 +191,7 @@ namespace ft {
 			_node_allocator(node_allocator_type()),
 			_size(0),
 			_root(0) {
-			DEBUG("red_black_tree range constructor called");
+			TREE_DEBUG("red_black_tree range constructor called");
 			this->insert(first, last);
 		}
 
@@ -149,17 +201,17 @@ namespace ft {
 			_node_allocator(copy.get_node_allocator()),
 			_size(0),
 			_root(0) {
-			DEBUG("red_black_tree copy constructor called");
+			TREE_DEBUG("red_black_tree copy constructor called");
 			this->operator=(copy);
 		};
 
 		~red_black_tree() {
-			DEBUG("red_black_tree deconstructor called");
+			TREE_DEBUG("red_black_tree deconstructor called");
 			this->deleteAll();
 		}
 
 		red_black_tree& operator=(const red_black_tree& other) {
-			DEBUG("red_black_tree assignment operator called");
+			TREE_DEBUG("red_black_tree assignment operator called");
 			if (this == &other) return *this;
 			this->deleteAll();
 			this->insert(other.begin(), other.end());
@@ -263,7 +315,7 @@ namespace ft {
 		}
 
 		void clear() {
-			this->destroyAll();
+			this->deleteAll();
 		}
 
 		iterator find(const value_type& val) {
@@ -287,19 +339,18 @@ namespace ft {
 		// draw tree
 
 	#ifdef _TREE_DEBUG
-		void printNode(const std::string& prefix, node_pointer node, bool isLeft)
-		{
+		void printNode(const std::string& prefix, node_pointer node, bool isLeft) const {
 			if (node != NULL)
 			{
 				std::cout << prefix;
 				std::cout << (isLeft ? "├──" : "└──" );
-				std::cout << ((node->color == RED) ? "\033[1;31m" : "") << node->value << "\033[0m\n";
+				std::cout << ((node->color == RED) ? "\033[1;31m" : "") << node->value.first << "\033[0m\n";
 				this->printNode(prefix + (isLeft ? "│   " : "    "), node->right, true);
 				this->printNode(prefix + (isLeft ? "│   " : "    "), node->left, false);
 			}
 		}
 
-		void printTree() {
+		void printTree() const {
 			this->printNode("", this->_root, false);
 		}
 	#endif
@@ -376,7 +427,7 @@ namespace ft {
 				left->right->parent = parent;
 			left->parent = parent->parent;
 			if (parent == this->_root)
-				this->_root = parent;
+				this->_root = left;
 			else if (parent == parent->parent->right)
 				parent->parent->right = left;
 			else
@@ -414,8 +465,9 @@ namespace ft {
 				this->deleteNode(node);
 			} else {
 				node_pointer next = node->left != NULL ? node_type::getPredecessor(node) : node_type::getSuccessor(node);
-				node_type::swapNodeValue(node, next);
-				this->destroyNode(next);
+				if (!node_type::swapNodeValue(node, next))
+					this->_root = next;
+				this->destroyNode(node);
 			}
 		}
 
@@ -448,15 +500,16 @@ namespace ft {
 					this->rotateNodeRight(parent);
 				return this->resolveDoubleBlack(node);
 			} else {
-				if (node_type::isBlack(sibling->left) && node_type::isBlack(sibling->right)) {
-					sibling->color = RED;
+				if (sibling == NULL || (node_type::isBlack(sibling->left) && node_type::isBlack(sibling->right))) {
+					if (sibling != NULL)
+						sibling->color = RED;
 					if (!node_type::isBlack(parent))
 						parent->color = BLACK;
 					else
 						return this->resolveDoubleBlack(parent);
 				} else if ((parent->left == node && !node_type::isBlack(sibling->left) && node_type::isBlack(sibling->right))
 						|| (parent->right == node && !node_type::isBlack(sibling->right) && node_type::isBlack(sibling->left))) {
-					if (parent->left == node && !node_type::isBlack(sibling->left)) {
+					if (parent->left == node) {
 						node_type::swapNodeColor(sibling, sibling->left);
 						this->rotateNodeRight(sibling);
 					} else {
@@ -466,7 +519,7 @@ namespace ft {
 					return this->resolveDoubleBlack(node);
 				} else if ((parent->left == node && !node_type::isBlack(sibling->right))
 						|| (parent->right == node && !node_type::isBlack(sibling->left))) {
-					if (parent->left == node && !node_type::isBlack(sibling->right)) {
+					if (parent->left == node) {
 						node_type::swapNodeColor(sibling, parent);
 						this->rotateNodeLeft(parent);
 						sibling->right->color = BLACK;

@@ -10,6 +10,7 @@
 #include <vector>
 #include <stack>
 #include <set>
+#include <cstdlib>
 
 struct A {};
 
@@ -262,13 +263,34 @@ int main() {
 	// 	--ite; // increment past one past the end, on mac segfault but on linux it will be 2
 	// 	--ite; // 5 on linux
 	// }
-	{
-		ft::map<int, std::string> mymap;
-		mymap.insert(ft::make_pair<int, std::string>(42, "hello"));
-		mymap.insert(ft::make_pair<int, std::string>(69, "nice"));
+	// {
+	// 	ft::map<int, std::string> mymap;
+	// 	mymap.insert(ft::make_pair<int, std::string>(42, "hello"));
+	// 	mymap.insert(ft::make_pair<int, std::string>(69, "nice"));
 
-		ft::map<int, std::string>::iterator it = mymap.begin();
-		for(; it != mymap.end(); ++it) {
+	// 	ft::map<int, std::string>::iterator it = mymap.begin();
+	// 	for(; it != mymap.end(); ++it) {
+	// 		std::cout << "key: " << it->first << ", value: " << it->second << std::endl;
+	// 	}
+	// }
+	{
+		int size = 100;
+		ft::map<int, int> m;
+		for (int i = 0; i < size; ++i) {
+			int a = std::rand() % size;
+			int b = std::rand() % size;
+			std::cout << a << " " << b << std::endl;
+			m.insert(ft::make_pair<int, int>(a, b));
+		}
+
+		for (int i = 0; i < size; ++i) {
+			int b = std::rand() % size;
+			std::cout << "delete: " << b << std::endl;
+			m.erase(b);
+		}
+
+		ft::map<int, int>::iterator it = m.begin();
+		for(; it != m.end(); ++it) {
 			std::cout << "key: " << it->first << ", value: " << it->second << std::endl;
 		}
 	}
