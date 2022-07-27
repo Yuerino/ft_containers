@@ -336,7 +336,7 @@ namespace ft {
 
 		void push_back(const value_type& val) {
 			if (this->size() == this->capacity())
-				this->reallocate(this->capacity() + 1);
+				this->reallocate((this->capacity() * 2) | 1);
 			this->get_allocator().construct(this->_storage_start + this->size(), val);
 			this->_size++;
 		}
