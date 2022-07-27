@@ -26,10 +26,16 @@ debug: re
 test:
 		git clone --recurse-submodules https://github.com/Yuerino/ft_containters_unit_test.git test
 
+benchmark:
+		git clone --recurse-submodules https://github.com/Yuerino/ft_containers_benchmark.git benchmark
+
 run_test: | test
 		make re -C test/
 		./test/unit_test
-		make clean -C test/
+
+run_bencmark: | benchmark
+		make re -C benchmark/
+		./benchmark/compare
 
 clean:
 		@$(RM) $(NAME)
