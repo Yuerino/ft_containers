@@ -2,6 +2,8 @@
 
 #include "type_traits.hpp"
 
+#include <iterator>
+
 // #ifdef _ITERATOR_DEBUG
 // #include <iostream>
 // #define DEBUG(x) (std::cout << x << std::endl)
@@ -10,13 +12,6 @@
 // #endif
 
 namespace ft {
-	// iterator category
-	struct input_iterator_tag {};
-	struct output_iterator_tag {};
-	struct forward_iterator_tag : public input_iterator_tag {};
-	struct bidirectional_iterator_tag : public forward_iterator_tag {};
-	struct random_access_iterator_tag : public bidirectional_iterator_tag {};
-
 	// ft::iterator_traits
 	// SFINAE trick to check if template type has certain member
 	// https://stackoverflow.com/questions/257288/templated-check-for-the-existence-of-a-class-member-function
@@ -54,21 +49,21 @@ namespace ft {
 	template<typename T>
 	struct iterator_traits<T*> {
 	public:
-		typedef random_access_iterator_tag	iterator_category;
-		typedef T							value_type;
-		typedef std::ptrdiff_t				difference_type;
-		typedef T*							pointer;
-		typedef T&							reference;
+		typedef std::random_access_iterator_tag	iterator_category;
+		typedef T								value_type;
+		typedef std::ptrdiff_t					difference_type;
+		typedef T*								pointer;
+		typedef T&								reference;
 	};
 
 	template<typename T>
 	struct iterator_traits<const T*> {
 	public:
-		typedef random_access_iterator_tag	iterator_category;
-		typedef T							value_type;
-		typedef std::ptrdiff_t				difference_type;
-		typedef const T*					pointer;
-		typedef const T&					reference;
+		typedef std::random_access_iterator_tag	iterator_category;
+		typedef T								value_type;
+		typedef std::ptrdiff_t					difference_type;
+		typedef const T*						pointer;
+		typedef const T&						reference;
 	};
 
 	// ft::random_access_iterator
@@ -447,7 +442,7 @@ namespace ft {
 		typedef typename ft::iterator_traits<TPtr>::value_type		value_type;
 		typedef typename ft::iterator_traits<TPtr>::pointer			pointer;
 		typedef typename ft::iterator_traits<TPtr>::reference		reference;
-		typedef bidirectional_iterator_tag							iterator_category;
+		typedef std::bidirectional_iterator_tag						iterator_category;
 
 	public:
 		bst_iterator() : _ptr(0), _tail(0), _isReversed(false) {
