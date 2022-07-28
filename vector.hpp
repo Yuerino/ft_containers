@@ -409,12 +409,12 @@ namespace ft {
 			iterator it = this->begin();
 			iterator it_end = this->end();
 			size_type i = std::distance(it, first);
-			size_type n = std::distance(first, last);
+			size_type n = std::distance(first, last) - 1;
 			it += i + n;
-			iterator it_ret = it;
+			iterator it_ret = it - n;
 			for (++it; it != it_end; ++i, ++it)
 				this->get_allocator().construct(this->_storage_start + i, *it);
-			for (++n;n > 0; --n) {
+			for (++n; n > 0; --n) {
 				this->get_allocator().destroy(this->_storage_start + this->_size - 1);
 				this->_size--;
 			}
