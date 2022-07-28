@@ -5,6 +5,8 @@
 #include "utility.hpp"
 #include "algorithm.hpp"
 
+#include <iterator>
+
 #include <memory>
 #include <stdexcept>
 #ifdef DEBUG
@@ -317,7 +319,7 @@ namespace ft {
 		template<typename InputIterator>
 		void assign(InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0) {
 			// TODO: compatiable with other iterator category
-			size_type len = ft::distance(first, last);
+			size_type len = std::distance(first, last);
 			if (len > this->capacity())
 				this->reallocate(len);
 			for (size_type i = 0; first != last; ++first, ++i)
@@ -351,7 +353,7 @@ namespace ft {
 			iterator it_end = this->end();
 			if (this->_size == this->_capacity)
 				this->reallocate(this->_size + 1);
-			size_type i = ft::distance(it, position);
+			size_type i = std::distance(it, position);
 			this->_size++;
 			it += i;
 			this->get_allocator().construct(this->_storage_start + i, val);
@@ -365,7 +367,7 @@ namespace ft {
 			iterator it_end = this->end();
 			if (this->_size + n > this->_capacity)
 				this->reallocate(this->_size + n);
-			size_type i = ft::distance(it, position);
+			size_type i = std::distance(it, position);
 			this->_size = this->_size + n;
 			it += i;
 			for (; n > 0; ++i, --n)
@@ -378,10 +380,10 @@ namespace ft {
 		void insert(iterator position, InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0) {
 			iterator it = this->begin();
 			iterator it_end = this->end();
-			size_type n = ft::distance(first, last);
+			size_type n = std::distance(first, last);
 			if (this->_size + n > this->_capacity)
 				this->reallocate(this->_size + n);
-			size_type i = ft::distance(it, position);
+			size_type i = std::distance(it, position);
 			this->_size = this->_size + n;
 			it += i;
 			for (; first != last; ++i, ++first)
@@ -393,7 +395,7 @@ namespace ft {
 		iterator erase(iterator position) {
 			iterator it = this->begin();
 			iterator it_end = this->end();
-			size_type i = ft::distance(it, position);
+			size_type i = std::distance(it, position);
 			it += i;
 			iterator it_ret = it;
 			for (++it; it != it_end; ++i, ++it)
@@ -406,8 +408,8 @@ namespace ft {
 		iterator erase(iterator first, iterator last) {
 			iterator it = this->begin();
 			iterator it_end = this->end();
-			size_type i = ft::distance(it, first);
-			size_type n = ft::distance(first, last);
+			size_type i = std::distance(it, first);
+			size_type n = std::distance(first, last);
 			it += i + n;
 			iterator it_ret = it;
 			for (++it; it != it_end; ++i, ++it)
