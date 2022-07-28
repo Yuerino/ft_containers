@@ -117,7 +117,7 @@ namespace ft {
 			#endif
 		}
 
-		random_access_iterator operator-(int val) {
+		random_access_iterator operator-(int val) const {
 			return random_access_iterator(this->_ptr - val);
 		}
 
@@ -126,7 +126,7 @@ namespace ft {
 			return *this;
 		}
 
-		random_access_iterator operator+(int val) {
+		random_access_iterator operator+(int val) const {
 			return random_access_iterator(this->_ptr + val);
 		}
 
@@ -153,15 +153,15 @@ namespace ft {
 			return random_access_iterator(this->_ptr--);
 		}
 
-		reference operator*() {
+		reference operator*() const {
 			return *this->_ptr;
 		}
 
-		pointer operator->() {
+		pointer operator->() const {
 			return this->_ptr;
 		}
 
-		reference operator[](const difference_type& n) {
+		reference operator[](const difference_type& n) const {
 			return *(this->_ptr + n);
 		}
 
@@ -299,7 +299,7 @@ namespace ft {
 			#endif
 		}
 
-		reverse_iterator operator-(int val) {
+		reverse_iterator operator-(int val) const {
 			return reverse_iterator(this->_iterator + val);
 		}
 
@@ -308,7 +308,7 @@ namespace ft {
 			return *this;
 		}
 
-		reverse_iterator operator+(int val) {
+		reverse_iterator operator+(int val) const {
 			return reverse_iterator(this->_iterator - val);
 		}
 
@@ -335,15 +335,15 @@ namespace ft {
 			return reverse_iterator(this->_iterator++);
 		}
 
-		reference operator*() {
+		reference operator*() const {
 			return *this->_iterator;
 		}
 
-		pointer operator->() {
+		pointer operator->() const {
 			return &(this->operator*());
 		}
 
-		reference operator[](const difference_type& n) {
+		reference operator[](const difference_type& n) const {
 			return *(this->_iterator - n);
 		}
 
@@ -517,11 +517,11 @@ namespace ft {
 			return tmp;
 		}
 
-		reference operator*() {
+		reference operator*() const {
 			return this->_ptr->value;
 		}
 
-		pointer operator->() {
+		pointer operator->() const {
 			return &(this->_ptr->value);
 		}
 
