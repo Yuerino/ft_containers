@@ -417,17 +417,17 @@ namespace ft {
 
 	template<typename Iterator1, typename Iterator2>
 	typename ft::iterator_traits<Iterator1>::difference_type operator-(const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs) {
-		return lhs.get_iterator() - rhs.get_iterator();
+		return rhs.get_iterator() - lhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	typename ft::iterator_traits<Iterator>::difference_type operator-(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs) {
-		return lhs.get_iterator() - rhs.get_iterator();
+		return rhs.get_iterator() - lhs.get_iterator();
 	}
 
 	template<typename Iterator>
 	reverse_iterator<Iterator> operator+(typename ft::iterator_traits<Iterator>::difference_type val, const reverse_iterator<Iterator>& rhs) {
-		return reverse_iterator<Iterator>(rhs.get_iterator() + val);
+		return reverse_iterator<Iterator>(rhs.get_iterator() - val);
 	}
 
 	template<typename TPtr, typename Tree>
