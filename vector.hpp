@@ -356,10 +356,11 @@ namespace ft {
 			size_type i = std::distance(it, position);
 			this->_size++;
 			it += i;
+			iterator it_ret = iterator(this->_storage_start + i);
 			this->get_allocator().construct(this->_storage_start + i, val);
 			for (++i; it != it_end; ++i, ++it)
 				this->get_allocator().construct(this->_storage_start + i, *it);
-			return iterator(this->_storage_start);
+			return it_ret;
 		}
 
 		void insert(iterator position, size_type n, const value_type& val) {
