@@ -318,13 +318,8 @@ namespace ft {
 
 		template<typename InputIterator>
 		void assign(InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0) {
-			// TODO: compatiable with other iterator category
-			size_type len = std::distance(first, last);
-			if (len > this->capacity())
-				this->reallocate(len);
-			for (size_type i = 0; first != last; ++first, ++i)
-				this->get_allocator().construct(this->_storage_start + i, *first);
-			this->_size = len;
+			typedef typename ft::iterator_traits<InputIterator>::iterator_category iterator_category;
+			this->_assign(first, last, iterator_category());
 		}
 
 		void assign(size_type n, const value_type& val) {
@@ -458,6 +453,23 @@ namespace ft {
 			this->_capacity = new_capacity;
 			this->_size = (this->_size > new_capacity) ? new_capacity : this->_size;
 			this->_storage_start = new_storage;
+		}
+
+		template<typename InputIterator>
+		void _assign(InputIterator first, InputIterator last, std::input_iterator_tag) {
+			for (; first != last; ++first)
+				this->push_back(*first);
+		}
+
+		template<typename InputIterator>
+		void _assign(InputIterator first, InputIterator last, std::forward_iterator_tag) {
+			size_type len = std::distance(first, last);
+			if (len > this->capacity())
+				this->reallocate(len);
+			for (size_type i = 0; i < len; ++first, ++i) {
+				this->get_allocator().construct(this->_storage_start + i, *first);
+			}
+			this->_size = len;
 		}
 	};
 
