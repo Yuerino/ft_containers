@@ -573,4 +573,27 @@ namespace ft {
 	bool operator!=(const bst_iterator<TPtr, Tree>& lhs, const bst_iterator<TPtr, Tree>& rhs) {
 		return lhs.address() != rhs.address();
 	}
+
+	// ft::distance
+	template<typename Iterator>
+	typename ft::iterator_traits<Iterator>::difference_type _distance(Iterator first, Iterator last, std::input_iterator_tag) {
+		typedef typename ft::iterator_traits<Iterator>::difference_type difference_type;
+
+		difference_type result = 0;
+		while (first != last) {
+			++first;
+			++result;
+		}
+		return result;
+	}
+
+	template<typename Iterator>
+	typename ft::iterator_traits<Iterator>::difference_type _distance(Iterator first, Iterator last, std::random_access_iterator_tag) {
+		return last - first;
+	}
+
+	template<typename Iterator>
+	typename ft::iterator_traits<Iterator>::difference_type distance(Iterator first, Iterator last) {
+		return ft::_distance(first, last, typename ft::iterator_traits<Iterator>::iterator_category());
+	}
 }

@@ -341,7 +341,7 @@ namespace ft {
 		}
 
 		iterator insert(iterator position, const value_type& val) {
-			size_type start = std::distance(this->begin(), position);
+			size_type start = ft::distance(this->begin(), position);
 			if (this->_size == this->_capacity)
 				this->reallocate(this->_size + 1);
 			iterator ite = this->end(); --ite;
@@ -357,7 +357,7 @@ namespace ft {
 		}
 
 		void insert(iterator position, size_type n, const value_type& val) {
-			size_type start = std::distance(this->begin(), position);
+			size_type start = ft::distance(this->begin(), position);
 			if (this->_size + n > this->_capacity)
 				this->reallocate(this->_size + n);
 			iterator ite = this->end(); --ite;
@@ -373,8 +373,8 @@ namespace ft {
 
 		template<typename InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0) {
-			size_type start = std::distance(this->begin(), position);
-			size_type n = std::distance(first, last);
+			size_type start = ft::distance(this->begin(), position);
+			size_type n = ft::distance(first, last);
 			if (this->_size + n > this->_capacity)
 				this->reallocate(this->_size + n);
 			iterator ite = this->end(); --ite;
@@ -390,7 +390,7 @@ namespace ft {
 		}
 
 		iterator erase(iterator position) {
-			size_type start = std::distance(this->begin(), position);
+			size_type start = ft::distance(this->begin(), position);
 			iterator it = this->begin() + start + 1;
 			for (size_type i = start; it != this->end(); ++i, ++it) {
 				this->get_allocator().construct(this->_storage_start + i, *it);
@@ -402,8 +402,8 @@ namespace ft {
 		}
 
 		iterator erase(iterator first, iterator last) {
-			size_type n = std::distance(first, last);
-			size_type start = std::distance(this->begin(), first);
+			size_type n = ft::distance(first, last);
+			size_type start = ft::distance(this->begin(), first);
 			iterator it = this->begin() + start + n;
 			for (size_type i = start; it != this->end(); ++i, ++it) {
 				this->get_allocator().construct(this->_storage_start + i, *it);
@@ -465,7 +465,7 @@ namespace ft {
 
 		template<typename InputIterator>
 		void _assign(InputIterator first, InputIterator last, std::forward_iterator_tag) {
-			size_type len = std::distance(first, last);
+			size_type len = ft::distance(first, last);
 			this->reallocate(len);
 			for (size_type i = 0; i < len; ++first, ++i)
 				this->get_allocator().construct(this->_storage_start + i, *first);
