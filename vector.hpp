@@ -341,48 +341,52 @@ namespace ft {
 		}
 
 		iterator insert(iterator position, const value_type& val) {
-			iterator it = this->begin();
-			iterator it_end = this->end();
+			size_type start = std::distance(this->begin(), position);
 			if (this->_size == this->_capacity)
 				this->reallocate(this->_size + 1);
-			size_type i = std::distance(it, position);
+			iterator ite = this->end(); --ite;
+
+			for (size_type i = this->_size; ite != this->begin() + start - 1; --i, --ite) {
+				this->get_allocator().construct(this->_storage_start + i, *ite);
+				this->_allocator.destroy(this->_storage_start + i - 1);
+			}
+			this->get_allocator().construct(this->_storage_start + start, val);
+
 			this->_size++;
-			it += i;
-			iterator it_ret = iterator(this->_storage_start + i);
-			this->get_allocator().construct(this->_storage_start + i, val);
-			for (++i; it != it_end; ++i, ++it)
-				this->get_allocator().construct(this->_storage_start + i, *it);
-			return it_ret;
+			return iterator(this->_storage_start + start);
 		}
 
 		void insert(iterator position, size_type n, const value_type& val) {
-			iterator it = this->begin();
-			iterator it_end = this->end();
+			size_type start = std::distance(this->begin(), position);
 			if (this->_size + n > this->_capacity)
 				this->reallocate(this->_size + n);
-			size_type i = std::distance(it, position);
+			iterator ite = this->end(); --ite;
+
+			for (size_type i = this->_size + n - 1; ite != this->begin() + start - 1; --i, --ite) {
+				this->get_allocator().construct(this->_storage_start + i, *ite);
+				this->_allocator.destroy(this->_storage_start + i - n);
+			}
 			this->_size = this->_size + n;
-			it += i;
-			for (; n > 0; ++i, --n)
-				this->get_allocator().construct(this->_storage_start + i, val);
-			for (; it != it_end; ++i, ++it)
-				this->get_allocator().construct(this->_storage_start + i, *it);
+			for (; n > 0; ++start, --n)
+				this->get_allocator().construct(this->_storage_start + start, val);
 		}
 
 		template<typename InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0) {
-			iterator it = this->begin();
-			iterator it_end = this->end();
+			size_type start = std::distance(this->begin(), position);
 			size_type n = std::distance(first, last);
 			if (this->_size + n > this->_capacity)
 				this->reallocate(this->_size + n);
-			size_type i = std::distance(it, position);
+			iterator ite = this->end(); --ite;
+
+			for (size_type i = this->_size + n - 1; ite != this->begin() + start - 1; --i, --ite) {
+				this->get_allocator().construct(this->_storage_start + i, *ite);
+				this->_allocator.destroy(this->_storage_start + i - n);
+			}
+
+			for (; first != last; ++start, ++first)
+				this->get_allocator().construct(this->_storage_start + start, *first);
 			this->_size = this->_size + n;
-			it += i;
-			for (; first != last; ++i, ++first)
-				this->get_allocator().construct(this->_storage_start + i, *first);
-			for (; it != it_end; ++i, ++it)
-				this->get_allocator().construct(this->_storage_start + i, *it);
 		}
 
 		iterator erase(iterator position) {
