@@ -114,8 +114,7 @@ namespace ft {
 			#ifdef DEBUG
 				std::cout << "vector deconstructor called" << std::endl;
 			#endif
-			if (this->_storage_start && this->_capacity > 1)
-				this->get_allocator().deallocate(this->_storage_start, this->_capacity);
+			this->reallocate(0);
 		}
 
 		/**
