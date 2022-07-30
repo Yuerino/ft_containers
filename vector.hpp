@@ -224,11 +224,10 @@ namespace ft {
 		 * @param val Data with which new elements should be populated.
 		 */
 		void resize(size_type n, value_type val = value_type()) {
-			size_type old_size = this->_size;
-			if (old_size != n)
+			if (this->_size != n)
 				this->reallocate(n);
-			if (n > old_size) {
-				for (size_type i = old_size; i < n; ++i)
+			if (n > this->_size) {
+				for (size_type i = this->_size; i < n; ++i)
 					this->get_allocator().construct(this->_storage_start + i, val);
 			}
 			this->_size = n;
