@@ -127,7 +127,6 @@ namespace ft {
 			#ifdef DEBUG
 				std::cout << "vector assignment operator called" << std::endl;
 			#endif
-			this->clear();
 			this->assign(x.begin(), x.end());
 			return *this;
 		}
@@ -317,16 +316,16 @@ namespace ft {
 
 		template<typename InputIterator>
 		void assign(InputIterator first, InputIterator last, typename ft::iterator_traits<InputIterator>::iterator_category* = 0) {
+			this->reallocate(0);
 			typedef typename ft::iterator_traits<InputIterator>::iterator_category iterator_category;
 			this->_assign(first, last, iterator_category());
 		}
 
 		void assign(size_type n, const value_type& val) {
-			if (n > this->capacity())
-				this->reallocate(n);
-			for (size_type i = 0; i < n; ++i) {
+			this->reallocate(0);
+			this->reallocate(n);
+			for (size_type i = 0; i < n; ++i)
 				this->get_allocator().construct(this->_storage_start + i, val);
-			}
 			this->_size = n;
 		}
 
@@ -467,11 +466,9 @@ namespace ft {
 		template<typename InputIterator>
 		void _assign(InputIterator first, InputIterator last, std::forward_iterator_tag) {
 			size_type len = std::distance(first, last);
-			if (len > this->capacity())
-				this->reallocate(len);
-			for (size_type i = 0; i < len; ++first, ++i) {
+			this->reallocate(len);
+			for (size_type i = 0; i < len; ++first, ++i)
 				this->get_allocator().construct(this->_storage_start + i, *first);
-			}
 			this->_size = len;
 		}
 	};
