@@ -390,32 +390,29 @@ namespace ft {
 		}
 
 		iterator erase(iterator position) {
-			iterator it = this->begin();
-			iterator it_end = this->end();
-			size_type i = std::distance(it, position);
-			it += i;
-			iterator it_ret = it;
-			for (++it; it != it_end; ++i, ++it)
+			size_type start = std::distance(this->begin(), position);
+			iterator it = this->begin() + start + 1;
+			for (size_type i = start; it != this->end(); ++i, ++it) {
 				this->get_allocator().construct(this->_storage_start + i, *it);
+				this->_allocator.destroy(this->_storage_start + i + 1);
+			}
 			this->get_allocator().destroy(this->_storage_start + this->_size - 1);
 			this->_size--;
-			return it_ret;
+			return this->begin() + start;
 		}
 
 		iterator erase(iterator first, iterator last) {
-			iterator it = this->begin();
-			iterator it_end = this->end();
-			size_type i = std::distance(it, first);
-			size_type n = std::distance(first, last) - 1;
-			it += i + n;
-			iterator it_ret = it - n;
-			for (++it; it != it_end; ++i, ++it)
+			size_type n = std::distance(first, last);
+			size_type start = std::distance(this->begin(), first);
+			iterator it = this->begin() + start + n;
+			for (size_type i = start; it != this->end(); ++i, ++it) {
 				this->get_allocator().construct(this->_storage_start + i, *it);
-			for (++n; n > 0; --n) {
-				this->get_allocator().destroy(this->_storage_start + this->_size - 1);
-				this->_size--;
+				this->_allocator.destroy(this->_storage_start + i + n);
 			}
-			return it_ret;
+			this->_size -= n;
+			for (; n > 0; --n)
+				this->get_allocator().destroy(this->_storage_start + this->_size - 1);
+			return this->begin() + start;
 		}
 
 		void swap(vector& x) {
