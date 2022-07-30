@@ -444,10 +444,14 @@ namespace ft {
 
 		void reallocate(size_type new_capacity) {
 			if (this->_capacity == new_capacity) return;
-			pointer new_storage = this->get_allocator().allocate(new_capacity);
+			pointer new_storage = NULL;
+			if (new_capacity > 0)
+				new_storage = this->get_allocator().allocate(new_capacity);
 			if (this->_storage_start) {
 				for (size_type i = 0; this->_storage_start != 0 && i < new_capacity && i < this->_size; ++i)
 					this->get_allocator().construct(new_storage + i, *(this->_storage_start + i));
+				for (size_type i = 0; i < this->_size; ++i)
+					this->get_allocator().destroy(this->_storage_start + i);
 				this->get_allocator().deallocate(this->_storage_start, this->_capacity);
 			}
 			this->_capacity = new_capacity;
