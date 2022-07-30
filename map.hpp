@@ -156,6 +156,7 @@ namespace ft {
 
 		// @note: ignore position hint for now (minimal performance lost)
 		iterator insert(iterator position, const value_type& val) {
+			(void)position;
 			return this->_tree_data.insert(val).first;
 		}
 
