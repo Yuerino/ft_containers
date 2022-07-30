@@ -434,7 +434,7 @@ namespace ft {
 		}
 
 	private:
-		const allocator_type _allocator;
+		allocator_type _allocator;
 		pointer _storage_start;
 		size_type _size;
 		size_type _capacity;
