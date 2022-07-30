@@ -31,7 +31,7 @@ benchmark:
 
 run_test: | test
 		make re -C test/
-		./test/unit_test
+		./test/unit_test --gtest_brief=1
 
 run_bencmark: | benchmark
 		make re -C benchmark/
