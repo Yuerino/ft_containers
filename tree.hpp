@@ -29,12 +29,16 @@ namespace ft {
 		pointer right;
 
 		static pointer getMinimum(pointer node) {
+			if (node == NULL)
+				return NULL;
 			while (node->left != NULL)
 				node = node->left;
 			return node;
 		}
 
 		static pointer getMaximum(pointer node) {
+			if (node == NULL)
+				return NULL;
 			while (node->right != NULL)
 				node = node->right;
 			return node;
