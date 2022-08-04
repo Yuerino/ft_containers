@@ -714,3 +714,10 @@ namespace ft {
 		x.swap(y);
 	}
 }
+
+namespace std {
+	template<typename T, typename Alloc>
+	void swap(ft::vector<T, Alloc>& x, ft::vector<T, Alloc>& y) {
+		x.swap(y);
+	}
+}
