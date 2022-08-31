@@ -296,6 +296,14 @@ namespace ft {
 			return *(this->_storage_start + this->size() - 1);
 		}
 
+		pointer data() {
+			return this->_storage_start;
+		}
+
+		const_pointer data() const {
+			return this->_storage_start;
+		}
+
 		// modifiers
 
 		template<typename InputIterator>
