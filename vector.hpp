@@ -593,10 +593,10 @@ namespace ft {
 			size_type distance = std::min(this->_size, to_position) - from_position;
 			pointer end_of_storage = this->_storage_start + this->_size;
 			if (to_position > this->_size) {
-				std::uninitialized_fill(end_of_storage, end_of_storage + to_position, default_val);
-				this->_size += to_position - this->_size;
+				std::uninitialized_fill(end_of_storage, this->_storage_start + to_position, default_val);
+				this->_size = to_position;
 			}
-			std::uninitialized_copy(end_of_storage - distance, end_of_storage, this->_storage_start + std::max(this->_size, to_position));
+			std::uninitialized_copy(end_of_storage - distance, end_of_storage, this->_storage_start + this->_size);
 			this->_size += distance;
 			std::copy_backward(this->_storage_start + from_position, end_of_storage - distance, end_of_storage);
 		}
