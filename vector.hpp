@@ -510,7 +510,8 @@ namespace ft {
 		template<typename InputIterator>
 		void range_insert(iterator position, InputIterator first, InputIterator last, std::input_iterator_tag) {
 			if (position != this->end()) {
-				ft::vector<value_type> tmp(first, last, this->get_allocator());
+				ft::vector<value_type> tmp;
+				tmp.assign(first, last);
 				this->insert(position, tmp.begin(), tmp.end());
 			} else {
 				for(; first != last; ++first)
