@@ -78,7 +78,13 @@ namespace ft {
 			_storage_start(0),
 			_size(0),
 			_capacity(0) {
-			this->assign(first, last);
+			try {
+				this->assign(first, last);
+			} catch (const std::exception& e) {
+				this->destroy_from_end(this->_size);
+				this->_allocator.deallocate(this->_storage_start, this->_capacity);
+				throw;
+			}
 		}
 
 		/**
