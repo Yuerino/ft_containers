@@ -327,7 +327,7 @@ namespace ft {
 				this->insert(*first);
 		}
 
-		void erase(iterator position) {
+		void erase(const_iterator position) {
 			this->destroyNode(position.base());
 		}
 
@@ -339,7 +339,7 @@ namespace ft {
 			return 1;
 		}
 
-		void erase(iterator first, iterator last) {
+		void erase(const_iterator first, const_iterator last) {
 			while (first != last)
 				this->destroyNode((first++).base());
 		}
