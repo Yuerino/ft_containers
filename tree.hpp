@@ -193,8 +193,8 @@ namespace ft {
 		typedef typename Allocator::const_pointer				const_pointer;
 		typedef ft::bst_iterator<pointer, node_type>			iterator;
 		typedef ft::bst_iterator<const_pointer, node_type>		const_iterator;
-		typedef ft::reverse_iterator<iterator>					reverse_iterator;
-		typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
+		typedef ft::bd_reverse_iterator<iterator>				reverse_iterator;
+		typedef ft::bd_reverse_iterator<const_iterator>			const_reverse_iterator;
 		typedef std::ptrdiff_t									difference_type;
 		typedef	std::size_t										size_type;
 

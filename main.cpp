@@ -300,9 +300,9 @@ int main() {
 	// {
 	// 	ft::vector<int> myvector;
 	// 	myvector.push_back(1); myvector.push_back(2);
-	// 	ft::vector<int>::reverse_iterator rit1 = myvector.rbegin();
-	// 	ft::vector<int>::reverse_iterator rit2 = myvector.rbegin();
-	// 	ft::vector<int>::reverse_iterator rit3 = myvector.rend();
+	// 	ft::vector<int>::rai_reverse_iterator rit1 = myvector.rbegin();
+	// 	ft::vector<int>::rai_reverse_iterator rit2 = myvector.rbegin();
+	// 	ft::vector<int>::rai_reverse_iterator rit3 = myvector.rend();
 	// 	ft::vector<int>::const_reverse_iterator rit4 = myvector.rbegin();
 
 	// 	std::cout << "rit1 == rit2: " << (rit1 == rit2) << std::endl;
