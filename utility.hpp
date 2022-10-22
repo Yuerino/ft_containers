@@ -1,14 +1,6 @@
 #pragma once
 
 namespace ft {
-	// ft::swap
-	template<typename T>
-	void swap(T& a, T& b) {
-		T tmp = a;
-		a = b;
-		b = tmp;
-	}
-
 	// ft::pair
 	template<typename T1, typename T2>
 	struct pair {
@@ -26,12 +18,11 @@ namespace ft {
 		pair(const first_type& a, const second_type& b) : first(a), second(b) {};
 
 		pair& operator=(const pair& pr) {
+			if (this == &pr) return *this;
 			this->first = pr.first;
 			this->second = pr.second;
 			return *this;
 		}
-
-		~pair() {}
 	};
 
 	template<typename T1, typename T2>

@@ -66,6 +66,24 @@ namespace ft {
 			this->_container.pop_back();
 		}
 
+		template<class _T, class _Container>
+		friend bool operator==(const stack<_T, _Container>& lhs, const stack<_T, _Container>& rhs);
+
+		template<class _T, class _Container>
+		friend bool operator!=(const stack<_T, _Container>& lhs, const stack<_T, _Container>& rhs);
+
+		template<class _T, class _Container>
+		friend bool operator<(const stack<_T, _Container>& lhs, const stack<_T, _Container>& rhs);
+
+		template<class _T, class _Container>
+		friend bool operator<=(const stack<_T, _Container>& lhs, const stack<_T, _Container>& rhs);
+
+		template<class _T, class _Container>
+		friend bool operator>(const stack<_T, _Container>& lhs, const stack<_T, _Container>& rhs);
+
+		template<class _T, class _Container>
+		friend bool operator>=(const stack<_T, _Container>& lhs, const stack<_T, _Container>& rhs);
+
 	protected:
 		container_type _container;
 	};

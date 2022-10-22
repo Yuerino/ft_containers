@@ -20,15 +20,24 @@ namespace ft {
 	template<typename T, typename TreeNode = binary_tree_node<T, void> >
 	struct binary_tree_node {
 		typedef T				value_type;
-		typedef TreeNode*		pointer;
-		typedef const TreeNode*	const_pointer;
+		typedef T*				pointer;
+		typedef TreeNode*		node_pointer;
+		typedef const TreeNode*	const_node_pointer;
 
 		value_type value;
-		pointer parent;
-		pointer left;
-		pointer right;
+		node_pointer parent;
+		node_pointer left;
+		node_pointer right;
 
-		static pointer getMinimum(pointer node) {
+		binary_tree_node() : value(), parent(), left(), right() {}
+
+		binary_tree_node(value_type _value, node_pointer _parent) : value(_value), parent(_parent), left(), right() {}
+
+		binary_tree_node(const binary_tree_node& other) : value(other.value), parent(other.parent), left(other.left), right(other.right) {}
+
+		~binary_tree_node() {}
+
+		static node_pointer getMinimum(node_pointer node) {
 			if (node == NULL)
 				return NULL;
 			while (node->left != NULL)
@@ -36,7 +45,7 @@ namespace ft {
 			return node;
 		}
 
-		static pointer getMaximum(pointer node) {
+		static node_pointer getMaximum(node_pointer node) {
 			if (node == NULL)
 				return NULL;
 			while (node->right != NULL)
@@ -44,15 +53,15 @@ namespace ft {
 			return node;
 		}
 
-		static bool hasChildren(pointer node) {
+		static bool hasChildren(node_pointer node) {
 			return (node->left != NULL || node->right != NULL);
 		}
 
-		static pointer getSuccessor(pointer node) {
+		static node_pointer getSuccessor(node_pointer node) {
 			if (node->right != NULL)
 				return binary_tree_node::getMinimum(node->right);
 			else {
-				pointer parent = node->parent;
+				node_pointer parent = node->parent;
 				while (parent != NULL && node == parent->right) {
 					node = parent;
 					parent = parent->parent;
@@ -62,11 +71,11 @@ namespace ft {
 			return node;
 		}
 
-		static pointer getPredecessor(pointer node) {
+		static node_pointer getPredecessor(node_pointer node) {
 			if (node->left != NULL)
 				return binary_tree_node::getMaximum(node->left);
 			else {
-				pointer parent = node->parent;
+				node_pointer parent = node->parent;
 				while (parent != NULL && node == parent->left) {
 					node = parent;
 					parent = parent->parent;
@@ -76,13 +85,13 @@ namespace ft {
 			return node;
 		}
 
-		static bool swapNodeValue(pointer node1, pointer node2) {
-			pointer parent1 = node1->parent;
-			pointer node1Left = node1->left;
-			pointer node1Right = node1->right;
-			pointer parent2 = node2->parent;
-			pointer node2Left = node2->left;
-			pointer node2Right = node2->right;
+		static bool swapNodeValue(node_pointer node1, node_pointer node2) {
+			node_pointer parent1 = node1->parent;
+			node_pointer node1Left = node1->left;
+			node_pointer node1Right = node1->right;
+			node_pointer parent2 = node2->parent;
+			node_pointer node2Left = node2->left;
+			node_pointer node2Right = node2->right;
 
 			if (parent1 != NULL && parent1->left == node1)
 				parent1->left = node2;
@@ -128,35 +137,53 @@ namespace ft {
 		}
 	};
 
+	enum rb_tree_color { RED, BLACK };
+
+	template<typename T>
+	struct rb_tree_node : public binary_tree_node<T, rb_tree_node<T> > {
+		typedef typename binary_tree_node<T, rb_tree_node>::value_type		value_type;
+		typedef typename binary_tree_node<T, rb_tree_node>::pointer			pointer;
+		typedef typename binary_tree_node<T, rb_tree_node>::node_pointer	node_pointer;
+
+		rb_tree_color color;
+
+		rb_tree_node() : binary_tree_node<T, rb_tree_node>() {}
+
+		rb_tree_node(value_type _value, node_pointer _parent) : binary_tree_node<T, rb_tree_node>(_value, _parent) {
+			if (this->parent == NULL)
+				this->color = BLACK;
+			else
+				this->color = RED;
+		}
+
+		rb_tree_node(const rb_tree_node& other) : binary_tree_node<T, rb_tree_node>(other), color(other.color) {}
+
+		~rb_tree_node() {}
+
+		static void swapNodeColor(node_pointer node1, node_pointer node2) {
+			rb_tree_color tmp = (node1 != NULL) ? node1->color : BLACK;
+			if (node1)
+				node1->color = (node2 != NULL) ? node2->color : BLACK;
+			if (node2)
+				node2->color = tmp;
+		}
+
+		static bool swapNodeValue(node_pointer node1, node_pointer node2) {
+			rb_tree_node::swapNodeColor(node1, node2);
+			return binary_tree_node<T, rb_tree_node>::swapNodeValue(node1, node2);
+		}
+
+		static bool isBlack(node_pointer node) {
+			return (node == NULL || node->color == BLACK);
+		}
+	};
+
 	template<typename T,
 			typename Compare = ft::less<T>,
 			typename Allocator = std::allocator<T> >
 	class red_black_tree {
-	protected:
-		enum rb_tree_color { RED, BLACK };
-
-		struct rb_tree_node : public binary_tree_node<T, rb_tree_node> {
-			rb_tree_color color;
-
-			static void swapNodeColor(typename rb_tree_node::pointer node1, typename rb_tree_node::pointer node2) {
-				rb_tree_color tmp = (node1 != NULL) ? node1->color : BLACK;
-				if (node1)
-					node1->color = (node2 != NULL) ? node2->color : BLACK;
-				if (node2)
-					node2->color = tmp;
-			}
-
-			static bool swapNodeValue(typename rb_tree_node::pointer node1, typename rb_tree_node::pointer node2) {\
-				rb_tree_node::swapNodeColor(node1, node2);
-				return binary_tree_node<T, rb_tree_node>::swapNodeValue(node1, node2);
-			}
-
-			static bool isBlack(typename rb_tree_node::pointer node) {
-				return (node == NULL || node->color == BLACK);
-			}
-		};
-
 	public:
+		typedef ft::rb_tree_node<T>								node_type;
 		typedef T												value_type;
 		typedef Compare											compare_type;
 		typedef Allocator										allocator_type;
@@ -164,17 +191,16 @@ namespace ft {
 		typedef typename Allocator::const_reference				const_reference;
 		typedef typename Allocator::pointer						pointer;
 		typedef typename Allocator::const_pointer				const_pointer;
-		typedef ft::bst_iterator<pointer, red_black_tree>		iterator;
-		typedef ft::bst_iterator<const_pointer, red_black_tree>	const_iterator;
+		typedef ft::bst_iterator<pointer, node_type>			iterator;
+		typedef ft::bst_iterator<const_pointer, node_type>		const_iterator;
 		typedef ft::reverse_iterator<iterator>					reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 		typedef std::ptrdiff_t									difference_type;
 		typedef	std::size_t										size_type;
 
-		typedef rb_tree_node												node_type;
 		typedef typename allocator_type::template rebind<node_type>::other	node_allocator_type;
-		typedef typename node_type::pointer									node_pointer;
-		typedef typename node_type::const_pointer							const_node_pointer;
+		typedef typename node_type::node_pointer							node_pointer;
+		typedef typename node_type::const_node_pointer						const_node_pointer;
 
 	public:
 		// construct/copy/destroy
@@ -189,7 +215,7 @@ namespace ft {
 		}
 
 		template<typename InputIterator>
-		red_black_tree(InputIterator first, InputIterator last, const compare_type& comp = compare_type(), const allocator_type& alloc = allocator_type(), typename ft::iterator_traits<InputIterator>::iterator_catergory* = 0) :
+		red_black_tree(InputIterator first, InputIterator last, const compare_type& comp = compare_type(), const allocator_type& alloc = allocator_type(), typename ft::iterator_traits<InputIterator>::iterator_category* = 0) :
 			_comp(comp),
 			_allocator(alloc),
 			_node_allocator(node_allocator_type()),
@@ -240,20 +266,20 @@ namespace ft {
 			return const_iterator(NULL, node_type::getMaximum(this->_root));
 		}
 
-		iterator rbegin() {
-			return reverse_iterator(iterator(node_type::getMaximum(this->_root), node_type::getMinimum(this->_root)));
+		reverse_iterator rbegin() {
+			return reverse_iterator(iterator(NULL, node_type::getMaximum(this->_root), true));
 		}
 
-		const_iterator rbegin() const {
-			return const_reverse_iterator(const_iterator(node_type::getMaximum(this->_root), node_type::getMinimum(this->_root)));
+		const_reverse_iterator rbegin() const {
+			return const_reverse_iterator(iterator(NULL, node_type::getMaximum(this->_root), true));
 		}
 
-		iterator rend() {
-			return reverse_iterator(iterator(NULL, node_type::getMinimum(this->_root)));
+		reverse_iterator rend() {
+			return reverse_iterator(iterator(node_type::getMinimum(this->_root), node_type::getMaximum(this->_root), true));
 		}
 
-		const_iterator rend() const {
-			return const_reverse_iterator(const_iterator(NULL, node_type::getMinimum(this->_root)));
+		const_reverse_iterator rend() const {
+			return const_reverse_iterator(iterator(node_type::getMinimum(this->_root), node_type::getMaximum(this->_root), true));
 		}
 
 		// capacity
@@ -302,7 +328,7 @@ namespace ft {
 		}
 
 		void erase(iterator position) {
-			this->destroyNode(position.address());
+			this->destroyNode(position.base());
 		}
 
 		size_type erase(const value_type& val) {
@@ -314,8 +340,14 @@ namespace ft {
 		}
 
 		void erase(iterator first, iterator last) {
-			for (; first != last; ++first)
-				this->destroyNode(first.address());
+			while (first != last)
+				this->destroyNode((first++).base());
+		}
+
+		void swap(red_black_tree& other) {
+			if (this == &other) return;
+			std::swap(this->_root, other._root);
+			std::swap(this->_size, other._size);
 		}
 
 		void clear() {
@@ -341,7 +373,6 @@ namespace ft {
 		}
 
 		// draw tree
-
 	#ifdef _TREE_DEBUG
 		void printNode(const std::string& prefix, node_pointer node, bool isLeft) const {
 			if (node != NULL)
@@ -442,14 +473,7 @@ namespace ft {
 
 		node_pointer addNewNode(const value_type& val, node_pointer parent_node) {
 			node_pointer node = _node_allocator.allocate(1);
-			_allocator.construct(&node->value, val);
-			node->left = NULL;
-			node->right = NULL;
-			node->parent = parent_node;
-			if (parent_node == NULL)
-				node->color = BLACK;
-			else
-				node->color = RED;
+			_node_allocator.construct(node, node_type(val, parent_node));
 			this->_size++;
 			return node;
 		}
@@ -462,9 +486,9 @@ namespace ft {
 		void destroyNode(node_pointer node) {
 			if (node == NULL)
 				return;
-			if (!node_type::hasChildren(node) && !node_type::isBlack(node))
+			if (!node_type::hasChildren(node) && !node_type::isBlack(node)) {
 				this->deleteNode(node);
-			else if (!node_type::hasChildren(node) && node_type::isBlack(node)) {
+			} else if (!node_type::hasChildren(node) && node_type::isBlack(node)) {
 				this->resolveDoubleBlack(node);
 				this->deleteNode(node);
 			} else {
@@ -485,7 +509,6 @@ namespace ft {
 				parent->left = NULL;
 			else if (parent->right == node)
 				parent->right = NULL;
-			_allocator.destroy(&node->value);
 			_node_allocator.destroy(node);
 			_node_allocator.deallocate(node, 1);
 			this->_size--;

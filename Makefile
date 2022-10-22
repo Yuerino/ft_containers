@@ -20,7 +20,7 @@ all: $(NAME)
 assert: CFLAGS = -Wall -Wextra -Werror -D ASSERT_TEST
 assert: re
 
-debug: CFLAGS = -Wall -Wextra -Werror -D ASSERT_TEST -D DEBUG
+debug: CFLAGS = -Wall -Wextra -Werror -g -D ASSERT_TEST -D VECTOR_DEBUG
 debug: re
 
 test:

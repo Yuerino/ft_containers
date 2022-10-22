@@ -47,7 +47,7 @@ namespace ft {
 		};
 
 	private:
-		typedef ft::red_black_tree<value_type, value_compare>		tree_type;
+		typedef ft::red_black_tree<value_type, value_compare, allocator_type>	tree_type;
 
 	public:
 		typedef typename tree_type::iterator						iterator;
@@ -60,22 +60,19 @@ namespace ft {
 
 		explicit map(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) :
 			_comp(comp),
-			_allocator(alloc),
-			_tree_data(tree_type(value_compare(comp))) {
+			_tree_data(tree_type(value_compare(comp), alloc)) {
 			MAP_DEBUG("map default constructor called");
 		}
 
 		template<typename InputIterator>
-		map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type(), typename ft::iterator_traits<InputIterator>::iterator_catergory* = 0) :
+		map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type(), typename ft::iterator_traits<InputIterator>::iterator_category* = 0) :
 			_comp(comp),
-			_allocator(alloc),
-			_tree_data(tree_type(first, last, value_compare(comp))) {
+			_tree_data(tree_type(first, last, value_compare(comp), alloc)) {
 			MAP_DEBUG("map range constructor called");
 		}
 
 		map(const map& x) :
 			_comp(key_compare()),
-			_allocator(x.get_allocator()),
 			_tree_data(x._tree_data) {
 			MAP_DEBUG("map copy constructor called");
 		}
@@ -142,7 +139,7 @@ namespace ft {
 		// element access
 
 		mapped_type& operator[](const key_type& k) {
-			iterator tmp = this->find(ft::make_pair<key_type, mapped_type>(k, mapped_type()));
+			iterator tmp = this->find(k);
 			if (tmp != this->end())
 				return tmp->second;
 			return (this->insert(ft::make_pair<key_type, mapped_type>(k, mapped_type())).first)->second;
@@ -178,7 +175,8 @@ namespace ft {
 		}
 
 		void swap(map& x) {
-			ft::swap(this->_tree_data, x._tree_data);
+			if (this == &x) return;
+			this->_tree_data.swap(x._tree_data);
 		}
 
 		void clear() {
@@ -192,7 +190,7 @@ namespace ft {
 		}
 
 		value_compare value_comp() const {
-			return value_compare();
+			return value_compare(this->_comp);
 		}
 
 		// operations
@@ -213,7 +211,7 @@ namespace ft {
 			iterator it = this->begin();
 			iterator ite = this->end();
 			for(; it != ite; ++it) {
-				if (!this->_comp(*it, k))
+				if (!this->_comp(it->first, k))
 					return it;
 			}
 			return ite;
@@ -223,7 +221,7 @@ namespace ft {
 			const_iterator it = this->begin();
 			const_iterator ite = this->end();
 			for(; it != ite; ++it) {
-				if (!this->_comp(*it, k))
+				if (!this->_comp(it->first, k))
 					return it;
 			}
 			return ite;
@@ -233,7 +231,7 @@ namespace ft {
 			iterator it = this->begin();
 			iterator ite = this->end();
 			for(; it != ite; ++it) {
-				if (this->_comp(*it, k))
+				if (this->_comp(k, it->first))
 					return it;
 			}
 			return ite;
@@ -243,7 +241,7 @@ namespace ft {
 			const_iterator it = this->begin();
 			const_iterator ite = this->end();
 			for(; it != ite; ++it) {
-				if (this->_comp(*it, k))
+				if (this->_comp(k, it->first))
 					return it;
 			}
 			return ite;
@@ -260,12 +258,11 @@ namespace ft {
 		// allocator
 
 		allocator_type get_allocator() const {
-			return allocator_type(this->_allocator);
+			return this->_tree_data.get_allocator();
 		}
 
 	private:
 		const key_compare _comp;
-		const allocator_type _allocator;
 		tree_type _tree_data;
 	};
 
@@ -300,9 +297,11 @@ namespace ft {
 	bool operator>=(const map<Key, T, Compare, Alloc>& lhs, const map<Key, T, Compare, Alloc>& rhs) {
 		return !(lhs < rhs);
 	}
+}
 
+namespace std {
 	template<typename Key, typename T, typename Compare, typename Alloc>
-	void swap(map<Key, T, Compare, Alloc>& x, map<Key, T, Compare, Alloc>& y) {
+	void swap(ft::map<Key, T, Compare, Alloc>& x, ft::map<Key, T, Compare, Alloc>& y) {
 		x.swap(y);
 	}
 }

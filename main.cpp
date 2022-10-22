@@ -11,21 +11,168 @@
 #include <stack>
 #include <set>
 #include <cstdlib>
+#include <sstream>
+#include <exception>
 
 struct A {};
 
-class WrapInt {
-public:
-	WrapInt(int i) : _nbr(i) {}
-	~WrapInt() { std::cout << this->_nbr << std::endl; }
-protected:
-	int _nbr;
+// class B {
+// public:
+//     B() : l(nullptr), i(1) {};
+// 	B(B const &b) : l(nullptr), i(b.i) {};
+//     B& operator=(B const &b) { this->i = b.i; return *this; };
+//     B(const int &ex) {
+//         this->i = ex;
+//         this->l = new char('a');
+//     };
+//     virtual ~B() {
+// 		if (this->l)
+// 			delete this->l;
+//         this->l = nullptr;
+// 		this->i = 64;
+//     };
+
+// 	char *l;
+// 	int i;
+// };
+
+// class C : public B {
+// public:
+//     C() : B() {};
+// 	C(C const &) : B() {};
+//     C& operator=(C const &) = default;
+//     C(const B* ex) : B() {
+// 		if (ex == nullptr) return;
+// 		std::cerr << "C ctor: " << ex->i << "\n";
+//         this->l = new char(*(ex->l));
+//         this->i = ex->i;
+//         if (ex->i < 0) throw "n";
+//     }
+//     ~C() {
+// 		std::cerr << "C dtor: " << this->i << "\n";
+// 		if (this->l)
+// 			delete this->l;
+//         this->l = nullptr;
+// 		this->i = 64;
+//     };
+// };
+
+// struct BaseDerivedInt {
+// 	int nbr;
+// 	int* leak;
+
+// 	BaseDerivedInt() : nbr(42), leak(0) { }
+// 	BaseDerivedInt(const int& n) : nbr(n), leak(new int(69)) { }
+// 	BaseDerivedInt(const int& n, int* l) : nbr(n), leak(l) { }
+// 	BaseDerivedInt(const BaseDerivedInt& copy) : nbr(copy.nbr), leak(0) { }
+// 	BaseDerivedInt& operator=(const BaseDerivedInt& other) {
+// 		this->nbr = other.nbr;
+// 		return *this;
+// 	}
+// 	virtual ~BaseDerivedInt() {
+// 		this->nbr++;
+// 		if (this->leak)
+// 			delete this->leak;
+// 		this->leak = NULL;
+// 	}
+// };
+
+// struct DerivedInt : public BaseDerivedInt {
+// 	DerivedInt() : BaseDerivedInt() { }
+// 	DerivedInt(const DerivedInt& copy) : BaseDerivedInt(copy.nbr, NULL) { }
+// 	DerivedInt& operator=(const DerivedInt& other) {
+// 		this->nbr = other.nbr;
+// 		return *this;
+// 	}
+// 	DerivedInt(const BaseDerivedInt* base) : BaseDerivedInt() {
+// 		if (base == NULL) return;
+// 		if (base->nbr < 0) throw "42";
+// 		this->nbr = base->nbr;
+// 		this->leak = new int(69);
+// 	}
+// 	~DerivedInt() {
+// 		this->nbr++;
+// 		if (this->leak)
+// 			delete this->leak;
+// 		this->leak = NULL;
+// 	}
+// };
+
+bool g_vector_force_exception = false;
+
+struct DerivedInt {
+	int nbr;
+	int* leak;
+
+	DerivedInt() : nbr(-1), leak(new int(69)) {
+		if (g_vector_force_exception) throw "42";
+	}
+	DerivedInt(const int& val) : nbr(val), leak(new int(69)) {
+		if (g_vector_force_exception) throw "42";
+	}
+	DerivedInt(const DerivedInt& copy) : nbr(copy.nbr), leak(new int(69)) {
+		if (g_vector_force_exception) throw "42";
+	}
+	DerivedInt& operator=(const DerivedInt& other) {
+		if (g_vector_force_exception) throw "42";
+		if (&other == this) return *this;
+		this->nbr = other.nbr;
+		return *this;
+	}
+	virtual ~DerivedInt() {
+		if (this->leak)
+			delete this->leak;
+		// This is to invalidate data at those memory in case user try to access them
+		this->nbr++;
+		this->leak = NULL;
+	}
 };
 
+
+std::ostream& operator<<(std::ostream& os, const DerivedInt& i) {
+	os << i.nbr;
+	return os;
+}
+
 int main() {
-	// { // ft::distance test
-	// 	std::vector<int> v(5, 42);
-	// 	std::cout << "ft::distance test: " << ft::distance(v.begin(), v.end()) << std::endl;
+	// {
+	// 	std::unique_ptr<BaseDerivedInt> k2(new BaseDerivedInt(5));
+	// 	std::unique_ptr<BaseDerivedInt> k3(new BaseDerivedInt(6));
+	// 	std::unique_ptr<BaseDerivedInt> k4(new BaseDerivedInt(-2));
+	// 	std::vector<BaseDerivedInt*> v1(5);
+	// 	v1.reserve(10);
+	// 	v1.push_back(&(*k2));
+	// 	v1.push_back(&(*k3));
+	// 	v1.push_back(&(*k4));
+
+	// 	// ft::vector<DerivedInt> vv(2);
+	// 	// ft::vector<BaseDerivedInt*> v1(5);
+		// std::vector<DerivedInt> vv;
+		// vv.reserve(20);
+		// vv.erase();
+
+	// 	// try { vv.insert(vv.end(), v1.end() - 1, v1.end() - 1); }
+	// 	// catch (...) {
+	// 	// 	std::cout << "here\n";
+	// 	// }
+	// 	try { vv.insert(vv.begin(), v1.begin(), v1.end()); }
+	// 	catch (...) {
+	// 		std::cout << "here1\n";
+	// 	}
+	// 	std::cout << "size: " << vv.size();
+	// 	std::cout << " cap: " << vv.capacity() << std::endl;
+	// 	for (auto& e : vv) {
+	// 			std::cout << "here1: " << e << " " << &e << std::endl;
+	// 	}
+	// }
+	// {
+	// 	std::vector<int> v1;
+	// 	for (int i=0; i < 5; ++i) v1.push_back(i);
+
+	// 	ft::vector<int> v2;
+	// 	for (int i=10; i < 15; ++i) v2.push_back(i);
+
+	// 	v2.insert(v2.end(), v1.rbegin(), v1.rend());
 	// }
 	// { // iterator test
 	// 	ft::vector<int> v(5, 42);
@@ -273,26 +420,93 @@ int main() {
 	// 		std::cout << "key: " << it->first << ", value: " << it->second << std::endl;
 	// 	}
 	// }
+	// {
+	// 	int size = 100;
+	// 	ft::map<int, int> m;
+	// 	for (int i = 0; i < size; ++i) {
+	// 		int a = std::rand() % size;
+	// 		int b = std::rand() % size;
+	// 		std::cout << a << " " << b << std::endl;
+	// 		m.insert(ft::make_pair<int, int>(a, b));
+	// 	}
+
+	// 	for (int i = 0; i < size; ++i) {
+	// 		int b = std::rand() % size;
+	// 		std::cout << "delete: " << b << std::endl;
+	// 		m.erase(b);
+	// 	}
+
+	// 	ft::map<int, int>::iterator it = m.begin();
+	// 	for(; it != m.end(); ++it) {
+	// 		std::cout << "key: " << it->first << ", value: " << it->second << std::endl;
+	// 	}
+	// }
+	// {
+	// 	ft::map<int, std::string> mymap;
+	// 	typedef ft::map<int, std::string>::value_type value_type;
+	// 	typedef ft::map<int, std::string>::iterator iterator;
+	// 	// ft::pair<iterator, bool> tmp;
+
+	// 	// tmp = mymap.insert(value_type(42, "lol"));
+	// 	// std::cout << (tmp.first)->first << std::endl;
+	// 	// std::cout << "Created new node: " << tmp.second << std::endl;
+	// 	iterator it = mymap.insert(mymap.begin(), value_type(42, "lol"));
+	// 	std::cout << it->first << std::endl;
+	// }
+	// {
+	// 	std::istringstream str("54 34 5754 344 5 6456 345 0 -1 42 69 55123");
+	// 	ft::vector<int> v((std::istream_iterator<int>(str)), std::istream_iterator<int>());
+	// 	for (ft::vector<int>::const_iterator it = v.begin(); it != v.end(); ++it)
+	// 		std::cout << *it << std::endl;
+	// }
+	// {
+	// 	ft::vector<DerivedInt> v;
+	// 	v.push_back(5);
+	// 	// for (int i=0; i<10; ++i) v.push_back(WrapInt(i));
+	// 	// v.clear();
+	// 	v.insert(v.begin(), 2, 42);
+
+	// 	ft::vector<DerivedInt>::iterator it = v.begin();
+	// 	ft::vector<DerivedInt>::iterator ite = v.end();
+	// 	for (; it != ite; ++it) std::cout << *it << std::endl;
+	// 	// std::vector<int> v;
+	// 	// // v.push_back(5);
+	// 	// // v.push_back(6);
+	// 	// // v.push_back(7);
+	// 	// // v.push_back(8);
+	// 	// for (int i=0; i<10; ++i) v.push_back(i);
+	// 	// // v.clear();
+	// 	// v.insert(v.begin(), 2, 42);
+
+	// 	// std::vector<int>::iterator it = v.begin();
+	// 	// std::vector<int>::iterator ite = v.end();
+	// 	// for (; it != ite; ++it) std::cout << *it << std::endl;
+	// }
+	// {
+	// 	ft::vector<int> vector;
+	// 	ft::vector<int> v;
+	// 	vector.assign(9900 * 1, 1);
+	// 	vector.resize(5000 * 1);
+	// 	vector.reserve(5000 * 1);
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+	// 	vector.resize(7000 * 1);
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+	// 	vector.resize(15300 * 1, int());
+	// 	v.push_back(vector.size());
+	// 	v.push_back(vector.capacity());
+
+	// 	std::cout << std::endl << "std: [ ";
+	// 	for (ft::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
+	// 		std::cout << *it << " ";
+	// 	std::cout << " ]\n";
+	// }
 	{
-		int size = 100;
-		ft::map<int, int> m;
-		for (int i = 0; i < size; ++i) {
-			int a = std::rand() % size;
-			int b = std::rand() % size;
-			std::cout << a << " " << b << std::endl;
-			m.insert(ft::make_pair<int, int>(a, b));
-		}
-
-		for (int i = 0; i < size; ++i) {
-			int b = std::rand() % size;
-			std::cout << "delete: " << b << std::endl;
-			m.erase(b);
-		}
-
-		ft::map<int, int>::iterator it = m.begin();
-		for(; it != m.end(); ++it) {
-			std::cout << "key: " << it->first << ", value: " << it->second << std::endl;
-		}
+		std::vector<DerivedInt> v(10, 42);
+		std::cerr << "here1\n";
+		g_vector_force_exception = true;
+		v.resize(8);
 	}
 	return 0;
 }

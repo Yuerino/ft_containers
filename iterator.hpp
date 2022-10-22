@@ -4,13 +4,6 @@
 
 #include <iterator>
 
-// #ifdef _ITERATOR_DEBUG
-// #include <iostream>
-// #define DEBUG(x) (std::cout << x << std::endl)
-// #else
-// #define DEBUG(...)
-// #endif
-
 namespace ft {
 	// ft::iterator_traits
 	// SFINAE trick to check if template type has certain member
@@ -18,9 +11,9 @@ namespace ft {
 	template<typename T>
 	struct _has_iterator_category {
 		private:
-			template<class _T>
+			template<typename _T>
 			static char _test(typename _T::iterator_category* = 0);
-			template<class _T>
+			template<typename _T>
 			static int _test(...);
 
 		public:
@@ -299,21 +292,30 @@ namespace ft {
 			#endif
 		}
 
+		// TODO: temp fix, extract this to 2 different reverse_iterator later based on iterator_category
 		reverse_iterator operator-(difference_type val) const {
-			return reverse_iterator(this->_iterator + val);
+			iterator_type tmp(this->_iterator);
+			for (int i = 0; i < val; ++i, ++tmp);
+			return reverse_iterator(tmp);
+			// return reverse_iterator(this->_iterator + val);
 		}
 
 		reverse_iterator operator-=(difference_type val) {
-			this->_iterator += val;
+			for (int i = 0; i < val; ++i, ++this->_iterator);
+			// this->_iterator += val;
 			return *this;
 		}
 
 		reverse_iterator operator+(difference_type val) const {
-			return reverse_iterator(this->_iterator - val);
+			iterator_type tmp(this->_iterator);
+			for (int i = 0; i < val; ++i, --tmp);
+			return reverse_iterator(tmp);
+			// return reverse_iterator(this->_iterator - val);
 		}
 
 		reverse_iterator operator+=(difference_type val) {
-			this->_iterator -= val;
+			for (int i = 0; i < val; ++i, --this->_iterator);
+			// this->_iterator -= val;
 			return *this;
 		}
 
@@ -336,7 +338,10 @@ namespace ft {
 		}
 
 		reference operator*() const {
-			return *iterator_type(this->_iterator - 1);
+			iterator_type tmp(this->_iterator);
+			--tmp;
+			return *iterator_type(tmp);
+			// return *iterator_type(this->_iterator - 1);
 		}
 
 		pointer operator->() const {
@@ -430,12 +435,11 @@ namespace ft {
 		return reverse_iterator<Iterator>(rhs.base() - val);
 	}
 
-	template<typename TPtr, typename Tree>
+	template<typename TPtr, typename Node>
 	class bst_iterator {
 	private:
-		typedef Tree												tree_type;
-		typedef typename Tree::node_type							node_type;
-		typedef typename Tree::node_pointer							node_pointer;
+		typedef Node												node_type;
+		typedef typename Node::node_pointer							node_pointer;
 
 	public:
 		typedef typename ft::iterator_traits<TPtr>::difference_type	difference_type;
@@ -461,10 +465,10 @@ namespace ft {
 		}
 
 		template<typename _TPtr>
-		bst_iterator(const bst_iterator<_TPtr, typename ft::enable_if<ft::are_same<_TPtr, typename Tree::node_pointer>::value, Tree>::type>& copy) :
-			_ptr(copy._ptr),
-			_tail(copy._tail),
-			_isReversed(copy._isReversed) {
+		bst_iterator(const bst_iterator<_TPtr, typename ft::enable_if<ft::are_same<_TPtr, typename Node::pointer>::value, node_type>::type>& copy) :
+			_ptr(copy.base()),
+			_tail(copy.tail()),
+			_isReversed(copy.isReversed()) {
 			#ifdef DEBUG
 				std::cout << "random access iterator const conversion constructor called" << std::endl;
 			#endif
@@ -525,8 +529,16 @@ namespace ft {
 			return &(this->_ptr->value);
 		}
 
-		node_pointer address() const {
+		node_pointer base() const {
 			return this->_ptr;
+		}
+
+		node_pointer tail() const {
+			return this->_tail;
+		}
+
+		bool isReversed() const {
+			return this->_isReversed;
 		}
 
 	private:
@@ -556,22 +568,22 @@ namespace ft {
 
 	template<typename TPtr1, typename TPtr2, typename Tree>
 	bool operator==(const bst_iterator<TPtr1, Tree>& lhs, const bst_iterator<TPtr2, Tree>& rhs) {
-		return lhs.address() == rhs.address();
+		return lhs.base() == rhs.base();
 	}
 
 	template<typename TPtr, typename Tree>
 	bool operator==(const bst_iterator<TPtr, Tree>& lhs, const bst_iterator<TPtr, Tree>& rhs) {
-		return lhs.address() == rhs.address();
+		return lhs.base() == rhs.base();
 	}
 
 	template<typename TPtr1, typename TPtr2, typename Tree>
 	bool operator!=(const bst_iterator<TPtr1, Tree>& lhs, const bst_iterator<TPtr2, Tree>& rhs) {
-		return lhs.address() != rhs.address();
+		return lhs.base() != rhs.base();
 	}
 
 	template<typename TPtr, typename Tree>
 	bool operator!=(const bst_iterator<TPtr, Tree>& lhs, const bst_iterator<TPtr, Tree>& rhs) {
-		return lhs.address() != rhs.address();
+		return lhs.base() != rhs.base();
 	}
 
 	// ft::distance

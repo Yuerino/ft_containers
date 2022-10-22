@@ -360,8 +360,10 @@ namespace ft {
 		}
 
 		iterator erase(iterator position) {
+			pointer positionStart = this->_storage_start + (position - this->begin());
+			pointer end = this->_storage_start + this->_size;
 			if (position + 1 != this->end())
-				std::copy(position + 1, this->end(), position);
+				std::copy(positionStart + 1, end, positionStart);
 			--this->_size;
 			this->_allocator.destroy(this->_storage_start + this->_size);
 			return position;
@@ -376,9 +378,10 @@ namespace ft {
 		}
 
 		void swap(vector& x) {
-			ft::swap(this->_storage_start, x._storage_start);
-			ft::swap(this->_size, x._size);
-			ft::swap(this->_capacity, x._capacity);
+			if (this == &x) return;
+			std::swap(this->_storage_start, x._storage_start);
+			std::swap(this->_size, x._size);
+			std::swap(this->_capacity, x._capacity);
 		}
 
 		void clear() {
@@ -722,11 +725,6 @@ namespace ft {
 	template<typename T, typename Alloc>
 	bool operator>=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
 		return !(lhs < rhs);
-	}
-
-	template<typename T, typename Alloc>
-	void swap(vector<T, Alloc>& x, vector<T, Alloc>& y) {
-		x.swap(y);
 	}
 }
 
